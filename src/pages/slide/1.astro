@@ -33,16 +33,56 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
         </div>
         <div class="grid grid-cols-2 gap-2">
           {[
-            { name: '김대표', color: '#9333EA', icon: '👤', active: true },
-            { name: '이팀장', color: '#5b21b6', icon: '👤', active: false },
-            { name: '박개발', color: '#7c3aed', icon: '👤', active: false },
-            { name: '최디자인', color: '#6d28d9', icon: '👤', active: false },
+            { name: '김대표', color: '#9333EA', active: true, gender: 'M', hair: '#1a1a2e', skin: '#f5d0a9', suit: '#2d1b69', accent: '#cc97ff' },
+            { name: '이팀장', color: '#5b21b6', active: false, gender: 'F', hair: '#2d1b3e', skin: '#f0c8a0', suit: '#3b1f7a', accent: '#e197fc' },
+            { name: '박개발', color: '#7c3aed', active: false, gender: 'M', hair: '#0f0f1a', skin: '#e8c49a', suit: '#1e1145', accent: '#9333EA' },
+            { name: '최디자인', color: '#6d28d9', active: false, gender: 'F', hair: '#3d2b1f', skin: '#f2d4b0', suit: '#2a1660', accent: '#cc97ff' },
           ].map((p) => (
             <div
               class="relative rounded-lg flex items-end justify-start p-2 overflow-hidden"
               style={`background:linear-gradient(135deg,${p.color}40,${p.color}20);border:1px solid ${p.color}40;aspect-ratio:16/9;`}
             >
-              <div class="absolute inset-0 flex items-center justify-center text-3xl opacity-30">{p.icon}</div>
+              <div class="absolute inset-0 flex items-center justify-center">
+                {p.gender === 'M' ? (
+                  <svg viewBox="0 0 120 120" class="w-16 h-16 opacity-70" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="60" cy="42" rx="22" ry="24" fill={p.skin} />
+                    <ellipse cx="60" cy="32" rx="23" ry="16" fill={p.hair} />
+                    <rect x="37" y="30" width="46" height="8" rx="4" fill={p.hair} />
+                    <ellipse cx="51" cy="44" rx="2.5" ry="2.5" fill="#1a1a2e" />
+                    <ellipse cx="69" cy="44" rx="2.5" ry="2.5" fill="#1a1a2e" />
+                    <circle cx="52" cy="43" r="0.8" fill="white" />
+                    <circle cx="70" cy="43" r="0.8" fill="white" />
+                    <path d="M46 38 Q51 35 56 38" stroke={p.hair} stroke-width="1.5" fill="none" />
+                    <path d="M64 38 Q69 35 74 38" stroke={p.hair} stroke-width="1.5" fill="none" />
+                    <path d="M53 55 Q60 59 67 55" stroke="#c4836a" stroke-width="1.2" fill="none" />
+                    <rect x="54" y="64" width="12" height="8" rx="4" fill={p.skin} />
+                    <path d="M30 120 Q30 82 60 72 Q90 82 90 120 Z" fill={p.suit} />
+                    <path d="M50 74 L60 84 L70 74" stroke="white" stroke-width="1.5" fill="none" opacity="0.5" />
+                    <path d="M58 82 L60 100 L62 82 Z" fill={p.accent} opacity="0.8" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 120 120" class="w-16 h-16 opacity-70" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="60" cy="42" rx="21" ry="24" fill={p.skin} />
+                    <ellipse cx="60" cy="34" rx="24" ry="18" fill={p.hair} />
+                    <ellipse cx="38" cy="50" rx="6" ry="16" fill={p.hair} />
+                    <ellipse cx="82" cy="50" rx="6" ry="16" fill={p.hair} />
+                    <ellipse cx="51" cy="44" rx="2.5" ry="3" fill="#1a1a2e" />
+                    <ellipse cx="69" cy="44" rx="2.5" ry="3" fill="#1a1a2e" />
+                    <circle cx="52" cy="43" r="0.8" fill="white" />
+                    <circle cx="70" cy="43" r="0.8" fill="white" />
+                    <path d="M47 41 Q51 39 55 41" stroke={p.hair} stroke-width="1.2" fill="none" />
+                    <path d="M65 41 Q69 39 73 41" stroke={p.hair} stroke-width="1.2" fill="none" />
+                    <path d="M54 55 Q60 59 66 55" stroke="#d4756a" stroke-width="1" fill="#d4756a" opacity="0.3" />
+                    <circle cx="38" cy="52" r="1.5" fill={p.accent} opacity="0.7" />
+                    <circle cx="82" cy="52" r="1.5" fill={p.accent} opacity="0.7" />
+                    <rect x="54" y="64" width="12" height="8" rx="4" fill={p.skin} />
+                    <path d="M30 120 Q30 82 60 72 Q90 82 90 120 Z" fill={p.suit} />
+                    <path d="M48 76 Q60 88 72 76" stroke="white" stroke-width="1" fill="white" opacity="0.12" />
+                    <path d="M50 74 Q60 80 70 74" stroke={p.accent} stroke-width="1" fill="none" opacity="0.6" />
+                    <circle cx="60" cy="78" r="2" fill={p.accent} opacity="0.7" />
+                  </svg>
+                )}
+              </div>
               <div class="relative z-10 flex items-center gap-1">
                 <div class={`w-1.5 h-1.5 rounded-full ${p.active ? 'bg-green-400' : 'bg-gray-500'}`}></div>
                 <span class="text-xs font-medium text-white/80">{p.name}</span>
@@ -56,10 +96,10 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
           ))}
         </div>
         <div class="mt-3 flex items-center gap-2">
-          <div class="flex-1 h-1 rounded-full bg-[#331557]">
-            <div class="h-1 rounded-full w-2/3" style="background:linear-gradient(90deg,#9333EA,#cc97ff);"></div>
+          <div class="flex-1 h-1.5 rounded-full bg-[#331557] overflow-hidden">
+            <div class="ai-progress-bar h-full rounded-full" style="background:linear-gradient(90deg,#9333EA,#cc97ff);"></div>
           </div>
-          <span class="text-xs" style="color:#cc97ff;">AI 요약 중...</span>
+          <span class="text-xs ai-pulse-text" style="color:#cc97ff;">AI 요약 중...</span>
         </div>
       </div>
 
@@ -99,3 +139,21 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
 
   </div>
 </SlideLayout>
+
+<style>
+  @keyframes ai-fill {
+    0% { width: 0%; }
+    80% { width: 100%; }
+    100% { width: 100%; }
+  }
+  .ai-progress-bar {
+    animation: ai-fill 3s ease-in-out infinite;
+  }
+  @keyframes ai-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .ai-pulse-text {
+    animation: ai-pulse 2s ease-in-out infinite;
+  }
+</style>
