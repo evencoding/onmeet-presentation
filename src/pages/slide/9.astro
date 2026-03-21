@@ -54,17 +54,17 @@ fun getJwks(): JwksResponse {
 ---
 
 <SlideLayout title="auth-service Code" slideNumber={9}>
-  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3 py-4 md:py-0">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-xl md:text-2xl text-glow-sm" style="color:#cc97ff;">
         auth-service — RSA Key Management & JWT
       </h2>
       <p class="text-sm mt-0.5 text-[#f0dfff]/60">Kotlin · Spring Security · AES-256-GCM + RS256</p>
     </div>
 
-    <div class="grid grid-cols-2 gap-4 opacity-init anim-scale d-200">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-init anim-scale d-200">
 
       <!-- Left: KeyManager code -->
       <div class="flex flex-col gap-2">

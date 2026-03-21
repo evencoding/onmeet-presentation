@@ -51,16 +51,16 @@ const features = [
 ---
 
 <SlideLayout title="Key Features" slideNumber={3}>
-  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
+  <div class="w-full max-w-6xl mx-auto px-4 md:px-6 flex flex-col gap-4 py-4 md:py-0">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Key Features</h2>
+      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl md:text-4xl text-glow-sm" style="color:#cc97ff;">Key Features</h2>
       <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">세 가지 핵심 기능</p>
     </div>
 
     <!-- Three feature cards -->
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       {features.map((f, i) => (
         <div
           class={`glass-card p-5 flex flex-col gap-3 opacity-init anim-fade-up d-${200 + i * 150}`}
@@ -90,7 +90,7 @@ const features = [
     </div>
 
     <!-- Bottom stat row -->
-    <div class="grid grid-cols-6 gap-2 opacity-init anim-fade-up d-700">
+    <div class="grid grid-cols-3 md:grid-cols-6 gap-2 opacity-init anim-fade-up d-700">
       {[
         { value: 'LiveKit', sub: 'SFU WebRTC' },
         { value: 'Whisper', sub: 'OpenAI STT' },

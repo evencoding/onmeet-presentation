@@ -3,17 +3,17 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
 ---
 
 <SlideLayout title="Hero" slideNumber={1}>
-  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col items-center justify-center gap-5">
+  <div class="w-full max-w-6xl mx-auto px-4 md:px-6 flex flex-col items-center justify-center gap-5 py-4 md:py-0">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
       <h1
-        class="font-['Manrope',sans-serif] font-extrabold text-[4.5rem] leading-none tracking-tight text-glow"
+        class="font-['Manrope',sans-serif] font-extrabold text-[2.5rem] md:text-[4.5rem] leading-none tracking-tight text-glow"
         style="color:#cc97ff;"
       >
         Onmeet
       </h1>
-      <p class="text-2xl font-semibold mt-2" style="color:#e197fc;">
+      <p class="text-lg md:text-2xl font-semibold mt-2" style="color:#e197fc;">
         AI가 회의를 기록하고, 요약하는 화상회의 플랫폼
       </p>
       <p class="text-base mt-1" style="color:#f0dfff;opacity:0.7;">
@@ -31,7 +31,7 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
           <span class="text-xs" style="color:#f0dfff;opacity:0.5;">Q1 전략 회의 · 00:42:17</span>
           <span class="badge badge-purple">4명 참여 중</span>
         </div>
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {[
             { name: '김대표', color: '#9333EA', active: true, gender: 'M', hair: '#1a1a2e', skin: '#f5d0a9', suit: '#2d1b69', accent: '#cc97ff' },
             { name: '이팀장', color: '#5b21b6', active: false, gender: 'F', hair: '#2d1b3e', skin: '#f0c8a0', suit: '#3b1f7a', accent: '#e197fc' },
@@ -123,7 +123,7 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
     </div>
 
     <!-- Stats row -->
-    <div class="w-full grid grid-cols-4 gap-3 opacity-init anim-fade-up d-600">
+    <div class="w-full grid grid-cols-2 md:grid-cols-4 gap-3 opacity-init anim-fade-up d-600">
       {[
         { value: '7', label: 'Microservices' },
         { value: '5', label: 'Languages' },

@@ -64,17 +64,17 @@ func (s *FileService) getFile(
 ---
 
 <SlideLayout title="file-service Code" slideNumber={14}>
-  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3 py-4 md:py-0">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-xl md:text-2xl text-glow-sm" style="color:#cc97ff;">
         file-service — High-Performance Go File Server
       </h2>
       <p class="text-sm mt-0.5 text-[#f0dfff]/60">Go · Gin · GORM · PostgreSQL · MinIO (S3) · AWS SDK v2</p>
     </div>
 
-    <div class="grid grid-cols-2 gap-4 opacity-init anim-scale d-200">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-init anim-scale d-200">
 
       <!-- Security code -->
       <div class="flex flex-col gap-2">
@@ -99,7 +99,7 @@ func (s *FileService) getFile(
           <Code code={uploadCode} lang="go" theme="one-dark-pro" />
         </div>
         <!-- Key highlights -->
-        <div class="grid grid-cols-2 gap-1.5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-1.5">
           {[
             { icon: '🕵️', label: 'MIME 바이너리 검사', desc: 'http.DetectContentType()', color: '#61ffe6' },
             { icon: '🛡️', label: 'S3 Key 인젝션 방어', desc: 'ownerType whitelist + regex', color: '#ff95a0' },
@@ -121,7 +121,7 @@ func (s *FileService) getFile(
 
     <!-- Go vs Kotlin comparison -->
     <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
-      <div class="flex items-center gap-6">
+      <div class="flex items-center gap-4 md:gap-6 flex-wrap">
         <div class="text-sm font-semibold" style="color:#61ffe6;">Why Go?</div>
         {[
           { label: '응답 속도', before: 'Kotlin ~450ms', after: 'Go ~4ms', color: '#61ff96' },

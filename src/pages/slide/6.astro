@@ -45,16 +45,16 @@ const pillars = [
 ---
 
 <SlideLayout title="Security Architecture" slideNumber={6}>
-  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
+  <div class="w-full max-w-6xl mx-auto px-4 md:px-6 flex flex-col gap-4 py-4 md:py-0">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Security Architecture</h2>
+      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl md:text-4xl text-glow-sm" style="color:#cc97ff;">Security Architecture</h2>
       <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">다층 보안 아키텍처 · Defense in Depth</p>
     </div>
 
     <!-- Three pillars -->
-    <div class="grid grid-cols-3 gap-4 opacity-init anim-scale d-200">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 opacity-init anim-scale d-200">
       {pillars.map((p, i) => (
         <div
           class={`glass-card p-4 flex flex-col gap-3`}

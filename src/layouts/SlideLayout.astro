@@ -48,12 +48,17 @@ const isActive = (match: number[]) => match.includes(slideNumber);
     </div>
 
     <!-- Top nav -->
-    <nav class="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-8 glass-card-bright rounded-none border-x-0 border-t-0">
+    <nav class="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-4 md:px-8 glass-card-bright rounded-none border-x-0 border-t-0">
       <a href="/slide/1" class="flex items-center gap-2 no-underline">
         <span class="font-['Manrope',sans-serif] font-extrabold text-xl text-glow-sm" style="color:#cc97ff;">Onmeet</span>
         <span class="text-sm text-[#9e41f5] font-medium hidden sm:inline">Presentation</span>
       </a>
-      <div class="flex items-center gap-1.5 overflow-x-auto">
+      <!-- Mobile: slide counter -->
+      <span class="md:hidden text-sm text-[#cc97ff]/80 font-medium">
+        {slideNumber} <span class="text-[#533e6d]">/</span> {totalSlides}
+      </span>
+      <!-- Desktop: full nav links -->
+      <div class="hidden md:flex items-center gap-1.5 overflow-x-auto">
         {navLinks.map((link) => (
           <a
             href={link.href}
@@ -66,26 +71,26 @@ const isActive = (match: number[]) => match.includes(slideNumber);
     </nav>
 
     <!-- Slide content -->
-    <main class="relative z-10 h-screen pt-14 pb-12 flex items-center justify-center overflow-hidden">
+    <main class="relative z-10 h-screen pt-14 pb-12 flex items-center md:items-center items-start justify-center overflow-hidden md:overflow-hidden overflow-y-auto">
       <slot />
     </main>
 
     <!-- Bottom bar -->
-    <footer class="fixed bottom-0 left-0 right-0 z-50 h-12 flex items-center justify-between px-8 glass-card-bright rounded-none border-x-0 border-b-0">
-      <span class="text-sm text-[#cc97ff]/80 font-medium">
+    <footer class="fixed bottom-0 left-0 right-0 z-50 h-12 flex items-center justify-between px-4 md:px-8 glass-card-bright rounded-none border-x-0 border-b-0">
+      <span class="text-sm text-[#cc97ff]/80 font-medium hidden md:inline">
         {slideNumber} <span class="text-[#533e6d]">/</span> {totalSlides}
       </span>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-3 md:gap-4 w-full md:w-auto justify-between md:justify-end">
         {slideNumber > 1 && (
           <a href={`/slide/${slideNumber - 1}`} class="text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors no-underline">← Prev</a>
         )}
         {slideNumber < totalSlides && (
           <a href={`/slide/${slideNumber + 1}`} class="text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors no-underline">Next →</a>
         )}
-        <span class="text-[#533e6d] hidden sm:inline">|</span>
-        <button id="btn-fullscreen" class="text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors cursor-pointer bg-transparent border-none" title="전체화면 (F)">⛶ 전체화면</button>
-        <button id="btn-pdf" class="text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors cursor-pointer bg-transparent border-none" title="PDF 다운로드">📄 PDF</button>
-        <span class="text-sm text-[#f0dfff]/30 hidden sm:inline ml-1">← → F</span>
+        <span class="text-[#533e6d] hidden md:inline">|</span>
+        <button id="btn-fullscreen" class="hidden md:inline text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors cursor-pointer bg-transparent border-none" title="전체화면 (F)">⛶ 전체화면</button>
+        <button id="btn-pdf" class="hidden md:inline text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors cursor-pointer bg-transparent border-none" title="PDF 다운로드">📄 PDF</button>
+        <span class="text-sm text-[#f0dfff]/30 hidden md:inline ml-1">← → F</span>
       </div>
     </footer>
 
@@ -130,6 +135,25 @@ const isActive = (match: number[]) => match.includes(slideNumber);
         toggleFullscreen();
       }
     });
+
+    // Touch swipe navigation
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const SWIPE_THRESHOLD = 50;
+
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      const diffX = touchStartX - e.changedTouches[0].screenX;
+      const diffY = touchStartY - e.changedTouches[0].screenY;
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > SWIPE_THRESHOLD) {
+        if (diffX > 0) goToSlide(getSlideNumber() + 1);
+        else goToSlide(getSlideNumber() - 1);
+      }
+    }, { passive: true });
 
     document.getElementById('btn-fullscreen')?.addEventListener('click', toggleFullscreen);
 

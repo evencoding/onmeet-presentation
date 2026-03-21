@@ -43,17 +43,17 @@ override fun filter(
 ---
 
 <SlideLayout title="gateway-service Code" slideNumber={10}>
-  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3 py-4 md:py-0">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-xl md:text-2xl text-glow-sm" style="color:#cc97ff;">
         gateway-service — Reactive Security Perimeter
       </h2>
       <p class="text-sm mt-0.5 text-[#f0dfff]/60">Kotlin · Spring Cloud Gateway · WebFlux</p>
     </div>
 
-    <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 opacity-init anim-scale d-200">
 
       <!-- Cookie Converter -->
       <div class="flex flex-col gap-2">
@@ -114,7 +114,7 @@ override fun filter(
     <!-- Flow summary -->
     <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
       <div class="text-sm font-semibold mb-1.5" style="color:#cc97ff;">Request Flow</div>
-      <div class="flex items-center gap-1.5 text-xs">
+      <div class="flex items-center gap-1.5 text-xs flex-wrap">
         {[
           'Browser Cookie',
           'CookieConverter → BearerToken',

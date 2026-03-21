@@ -29,6 +29,14 @@ html, body {
   height: 100%;
 }
 
+/* Mobile: allow vertical scroll */
+@media (max-width: 767px) {
+  html, body {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
 .glass-card {
   background: rgba(51, 21, 87, 0.4);
   backdrop-filter: blur(16px);
@@ -196,4 +204,24 @@ html, body {
 :fullscreen main {
   transform: scale(1.25);
   transform-origin: center center;
+}
+
+/* ── Mobile responsive ── */
+@media (max-width: 767px) {
+  .nebula-orb {
+    width: 250px !important;
+    height: 250px !important;
+    filter: blur(80px);
+  }
+  .code-block {
+    font-size: 0.72rem;
+  }
+  .astro-code {
+    font-size: 0.7rem !important;
+    padding: 0.75rem 0.8rem !important;
+    line-height: 1.5 !important;
+  }
+  .pipeline-arrow {
+    font-size: 0.9rem;
+  }
 }

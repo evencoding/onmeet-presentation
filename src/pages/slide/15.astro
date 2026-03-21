@@ -56,17 +56,17 @@ public synchronized String getAccessToken() {
 ---
 
 <SlideLayout title="email-service Code" slideNumber={15}>
-  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3 py-4 md:py-0">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-xl md:text-2xl text-glow-sm" style="color:#cc97ff;">
         email-service — Template-based Email + Gmail OAuth2
       </h2>
       <p class="text-sm mt-0.5 text-[#f0dfff]/60">Java · Spring Boot · Thymeleaf · Gmail SMTP OAuth2</p>
     </div>
 
-    <div class="grid grid-cols-2 gap-4 opacity-init anim-scale d-200">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-init anim-scale d-200">
 
       <!-- Template Guard -->
       <div class="flex flex-col gap-2">
@@ -108,7 +108,7 @@ public synchronized String getAccessToken() {
     </div>
 
     <!-- Email templates + highlights -->
-    <div class="grid grid-cols-2 gap-3 opacity-init anim-fade-up d-400">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 opacity-init anim-fade-up d-400">
       <div class="glass-card p-2.5">
         <div class="text-sm font-semibold mb-2" style="color:#cc97ff;">📧 Email Templates (Thymeleaf)</div>
         <div class="flex flex-wrap gap-1.5">

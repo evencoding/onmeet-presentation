@@ -3,11 +3,11 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
 ---
 
 <SlideLayout title="Infrastructure & DevOps" slideNumber={8}>
-  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
+  <div class="w-full max-w-6xl mx-auto px-4 md:px-6 flex flex-col gap-4 py-4 md:py-0">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Infrastructure & DevOps</h2>
+      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl md:text-4xl text-glow-sm" style="color:#cc97ff;">Infrastructure & DevOps</h2>
       <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">GCP + Docker + GitHub Actions CI/CD</p>
     </div>
 
@@ -37,7 +37,7 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
     </div>
 
     <!-- 4 info cards -->
-    <div class="grid grid-cols-4 gap-3 opacity-init anim-scale d-300">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 opacity-init anim-scale d-300">
       {[
         {
           icon: '🏗️',
