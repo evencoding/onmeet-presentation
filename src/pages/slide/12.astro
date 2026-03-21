@@ -1,0 +1,146 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import { Code } from 'astro:components';
+
+const vadCode = `// SileroVadClient.java — ONNX VAD 추론
+private float runInference(float[] window,
+                           float[] state, long[] sr) {
+    OnnxTensor inputTensor = OnnxTensor.createTensor(
+        env, FloatBuffer.wrap(window), inputShape);
+    OnnxTensor stateTensor = OnnxTensor.createTensor(
+        env, FloatBuffer.wrap(state), stateShape);
+    Map<String, OnnxTensor> inputs = Map.of(
+        "input", inputTensor,
+        "state", stateTensor,
+        "sr", OnnxTensor.createTensor(env, sr));
+    try (OrtSession.Result result = session.run(inputs)) {
+        float[][] output =
+            (float[][]) result.get(0).getValue();
+        return output[0][0]; // speech probability
+    }
+}`;
+
+const sttCode = `// SttWorkerService.java — VAD → STT 파이프라인
+for (int i = 0; i < segments.size(); i++) {
+    SpeechSegment seg = segments.get(i);
+    // 100ms 미만 노이즈 스킵
+    if (seg.endMs() - seg.startMs() < 100) continue;
+    byte[] segmentAudio = audioDecoder
+        .extractAndEncode(pcmSamples, seg);
+    String text = sttClient.transcribe(
+        segmentAudio, "seg-" + i + ".wav", "audio/wav");
+    publishVoiceSegment(
+        event,
+        chunkStartMs + seg.startMs(),
+        chunkStartMs + seg.endMs(),
+        sequenceNo, text
+    );
+}`;
+
+const claudeCode = `// ClaudeSummarizerClient.java — 구조화 JSON 출력
+String systemPrompt = """
+    You MUST output ONLY a valid JSON object:
+    {
+      "description": "전체 회의 요약",
+      "keywords": ["키워드1", "키워드2"],
+      "decisions": ["결정사항1"],
+      "actionItems": [{
+        "assignee": "담당자",
+        "task": "작업내용",
+        "dueDate": "기한"
+      }]
+    }""";
+// JSON 스키마 검증 후 저장`;
+---
+
+<SlideLayout title="ai-service Code" slideNumber={12}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+        ai-service — VAD → STT → LLM Pipeline
+      </h2>
+      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Java · Spring Boot · Silero ONNX · Whisper · Claude</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
+
+      <!-- VAD -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SileroVadClient</span>
+          <span class="badge badge-purple">ONNX</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:220px;">
+          <Code code={vadCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2">
+          <div class="text-sm font-semibold text-[#9333EA]">Silero VAD v4</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-0.5">
+            ONNX Runtime으로 30ms 슬라이딩 윈도우 추론.
+            speech probability &gt; 0.5 구간만 STT로 전달.
+          </div>
+        </div>
+      </div>
+
+      <!-- STT Worker -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SttWorkerService</span>
+          <span class="badge badge-blue">Whisper</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:220px;">
+          <Code code={sttCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2">
+          <div class="text-sm font-semibold text-[#61aaff]">세그먼트별 STT</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-0.5">
+            VAD 세그먼트를 WAV로 인코딩 후 Whisper API 호출.
+            100ms 미만 잡음 자동 스킵. voice-segment Kafka 발행.
+          </div>
+        </div>
+      </div>
+
+      <!-- Claude Summarizer -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">ClaudeSummarizer</span>
+          <span class="badge badge-cyan">LLM</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:220px;">
+          <Code code={claudeCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2">
+          <div class="text-sm font-semibold text-[#61ffe6]">구조화 JSON 출력</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-0.5">
+            Claude API에 JSON 스키마를 시스템 프롬프트로 강제.
+            description·keywords·decisions·actionItems 추출.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Pipeline summary -->
+    <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
+      <div class="flex items-center gap-3 flex-wrap">
+        {[
+          { icon: '📥', label: 'Kafka Consumer', color: '#ffb964' },
+          { icon: '🔊', label: 'S3 오디오 다운로드', color: '#61aaff' },
+          { icon: '🎚️', label: 'Silero VAD 필터링', color: '#cc97ff' },
+          { icon: '📝', label: 'Whisper STT 변환', color: '#9333EA' },
+          { icon: '🤖', label: 'Claude 요약 생성', color: '#e197fc' },
+          { icon: '💾', label: 'file-service 저장 + SSE', color: '#61ff96' },
+        ].map((s, i) => (
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs">{s.icon}</span>
+            <span class="text-xs" style={`color:${s.color};`}>{s.label}</span>
+            {i < 5 && <span class="text-[#533e6d] text-xs">→</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</SlideLayout>

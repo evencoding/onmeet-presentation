@@ -1,0 +1,110 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import { Code } from 'astro:components';
+
+const keyManagerCode = `// KeyManager.kt — RSA 키 AES-256-GCM 암호화 저장
+companion object {
+    private const val PBKDF2_ITERATIONS = 600000
+    private const val SALT_LENGTH = 16
+    private const val IV_LENGTH = 12
+    private const val GCM_AUTH_TAG_LENGTH = 128
+}
+
+private fun encrypt(data: ByteArray): String {
+    val salt = ByteArray(SALT_LENGTH)
+    secureRandom.nextBytes(salt)
+    val secretKey = getSecretKey(salt) // PBKDF2WithHmacSHA256
+    val iv = ByteArray(IV_LENGTH)
+    secureRandom.nextBytes(iv)
+    val spec = GCMParameterSpec(GCM_AUTH_TAG_LENGTH, iv)
+    val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+    cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec)
+    val cipherText = cipher.doFinal(data)
+    // Format: Salt(16) + IV(12) + CipherText
+    val combined = ByteArray(salt.size + iv.size + cipherText.size)
+    System.arraycopy(salt, 0, combined, 0, salt.size)
+    System.arraycopy(iv, 0, combined, salt.size, iv.size)
+    System.arraycopy(cipherText, 0, combined, salt.size + iv.size, cipherText.size)
+    return Base64.getEncoder().encodeToString(combined)
+}`;
+
+const jwtCode = `// JwtTokenProvider.kt — RS256 토큰 생성
+fun generateAccessToken(userId: Long, email: String,
+                        roles: List<String>): String {
+    val now = Date()
+    return Jwts.builder()
+        .subject(email)
+        .claim("userId", userId)
+        .claim("roles", roles)
+        .issuedAt(now)
+        .expiration(Date(now.time + ACCESS_TOKEN_EXPIRY))
+        .signWith(keyManager.getPrivateKey(), Jwts.SIG.RS256)
+        .compact()
+}
+
+// JWKS endpoint — 공개키 노출
+@GetMapping("/.well-known/jwks.json")
+fun getJwks(): JwksResponse {
+    val publicKey = keyManager.getPublicKey() as RSAPublicKey
+    return JwksResponse(keys = listOf(
+        JwkKey(n = encode(publicKey.modulus),
+               e = encode(publicKey.publicExponent))
+    ))
+}`;
+---
+
+<SlideLayout title="auth-service Code" slideNumber={9}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+        auth-service — RSA Key Management & JWT
+      </h2>
+      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Kotlin · Spring Security · AES-256-GCM + RS256</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 opacity-init anim-scale d-200">
+
+      <!-- Left: KeyManager code -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">KeyManager.kt</span>
+          <span class="badge badge-purple">AES-256-GCM</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:310px;">
+          <Code code={keyManagerCode} lang="kotlin" theme="one-dark-pro" />
+        </div>
+      </div>
+
+      <!-- Right: JWT code + explanations -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">JwtTokenProvider.kt</span>
+          <span class="badge badge-purple">RS256</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:180px;">
+          <Code code={jwtCode} lang="kotlin" theme="one-dark-pro" />
+        </div>
+        <!-- Key highlights -->
+        <div class="grid grid-cols-1 gap-1.5">
+          {[
+            { icon: '🔑', label: 'PBKDF2 600K 반복', desc: 'KDF 브루트포스 방어', color: '#cc97ff' },
+            { icon: '🧂', label: 'Salt + IV + CipherText', desc: '16+12+N 바이트 구조', color: '#9333EA' },
+            { icon: '✍️', label: 'RS256 서명', desc: 'RSA-2048 개인키 서명', color: '#e197fc' },
+            { icon: '🌐', label: 'JWKS 공개 노출', desc: 'Gateway NimbusDecoder', color: '#61aaff' },
+          ].map((h) => (
+            <div class="glass-card px-3 py-1.5 flex items-center gap-2.5">
+              <span class="text-base">{h.icon}</span>
+              <div>
+                <span class="text-sm font-semibold" style={`color:${h.color};`}>{h.label}</span>
+                <span class="text-xs text-[#f0dfff]/50 ml-2">{h.desc}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</SlideLayout>

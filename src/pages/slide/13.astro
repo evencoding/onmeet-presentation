@@ -1,0 +1,137 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import { Code } from 'astro:components';
+
+const sseCode = `// NotificationService.java — Multi-tab SSE
+Map<Long, Map<String, SseEmitter>> emitters =
+    new ConcurrentHashMap<>();
+
+public SseEmitter subscribe(Long userId) {
+    SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
+    String emitterId = userId + "_" + UUID.randomUUID();
+    emitters
+        .computeIfAbsent(userId, k -> new ConcurrentHashMap<>())
+        .put(emitterId, emitter);
+    emitter.onCompletion(() -> removeEmitter(userId, emitterId));
+    emitter.onTimeout(() -> removeEmitter(userId, emitterId));
+    emitter.send(
+        SseEmitter.event().name("connect").data("Connected!")
+    );
+    return emitter;
+}`;
+
+const heartbeatCode = `// 30초 주기 heartbeat
+@Scheduled(fixedRate = 30_000)
+public void sendHeartbeat() {
+    emitters.forEach((userId, userEmitters) -> {
+        userEmitters.forEach((id, emitter) -> {
+            try {
+                emitter.send(SseEmitter.event()
+                    .comment("heartbeat"));
+            } catch (IOException e) {
+                removeEmitter(userId, id);
+            }
+        });
+    });
+}`;
+
+const fcmCode = `// FCM 알림 발송 (모바일 지원)
+public void sendFcmNotification(
+    Long userId, NotificationMessage msg
+) {
+    List<String> tokens = fcmTokenRepo.findByUserId(userId);
+    if (tokens.isEmpty()) return;
+    MulticastMessage message = MulticastMessage.builder()
+        .addAllTokens(tokens)
+        .setNotification(Notification.builder()
+            .setTitle(msg.title())
+            .setBody(msg.body())
+            .build())
+        .putAllData(msg.data())
+        .build();
+    FirebaseMessaging.getInstance()
+        .sendEachForMulticast(message);
+}`;
+---
+
+<SlideLayout title="notification-service Code" slideNumber={13}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+        notification-service — SSE + FCM Real-time
+      </h2>
+      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Java · Spring Boot · SSE · Firebase FCM · Kafka</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
+
+      <!-- Multi-tab SSE -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SSE Subscribe</span>
+          <span class="badge badge-purple">Multi-tab</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:220px;">
+          <Code code={sseCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2">
+          <div class="text-sm font-semibold text-[#cc97ff]">멀티탭 SSE 지원</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-0.5">
+            userId → Map&lt;emitterId, SseEmitter&gt; 2중 Map.
+            동일 유저의 여러 탭 동시 연결 처리.
+          </div>
+        </div>
+      </div>
+
+      <!-- Heartbeat -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">Heartbeat</span>
+          <span class="badge badge-green">@Scheduled</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:220px;">
+          <Code code={heartbeatCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2">
+          <div class="text-sm font-semibold text-[#61ff96]">연결 유지 heartbeat</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-0.5">
+            30초 주기로 SSE comment 전송.
+            IOException 발생 시 dead emitter 자동 제거.
+          </div>
+        </div>
+      </div>
+
+      <!-- FCM -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">FCM Dispatch</span>
+          <span class="badge badge-orange">Firebase</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:220px;">
+          <Code code={fcmCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2">
+          <div class="text-sm font-semibold text-[#ffb964]">모바일 Push</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-0.5">
+            FCM MulticastMessage로 복수 디바이스 동시 발송.
+            SSE(웹) + FCM(모바일) 이중 채널.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Kafka consumer + notification types -->
+    <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
+      <div class="flex items-center gap-4 flex-wrap">
+        <div class="text-sm font-semibold" style="color:#cc97ff;">📨 Kafka Consumer Topics</div>
+        {['meeting-start', 'meeting-end', 'ai-summary-ready', 'invitation', 'temporary-password'].map((t) => (
+          <span class="badge badge-orange">{t}</span>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</SlideLayout>

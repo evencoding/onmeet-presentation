@@ -1,0 +1,130 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+
+const columns = [
+  {
+    title: 'Backend',
+    icon: '⚙️',
+    color: '#9333EA',
+    badgeClass: 'badge-purple',
+    techs: [
+      'Spring Boot 3.3.5',
+      'Kotlin (auth/gateway)',
+      'Java (ai/video/notification)',
+      'Go (file-service)',
+      'Spring Security',
+      'Spring WebFlux',
+      'JPA + Flyway',
+      'MapStruct 1.6.2',
+      'Lombok',
+    ],
+  },
+  {
+    title: 'Frontend',
+    icon: '🖥️',
+    color: '#61aaff',
+    badgeClass: 'badge-blue',
+    techs: [
+      'React 18',
+      'TypeScript',
+      'Vite',
+      'Zustand',
+      'TanStack Query',
+      'React Router v6',
+      'Tailwind CSS v4',
+      'BlockNote Editor',
+      'Cloudflare Pages',
+    ],
+  },
+  {
+    title: 'AI & Media',
+    icon: '🤖',
+    color: '#e197fc',
+    badgeClass: 'badge-purple',
+    techs: [
+      'OpenAI Whisper STT',
+      'Claude API (Anthropic)',
+      'Silero VAD v4 ONNX',
+      'LiveKit SFU',
+      'WebRTC',
+      'LiveKit Egress',
+      'AWS SES (Email)',
+      'Thymeleaf Templates',
+    ],
+  },
+  {
+    title: 'Infrastructure',
+    icon: '🏗️',
+    color: '#61ffe6',
+    badgeClass: 'badge-cyan',
+    techs: [
+      'GCP e2-standard-4',
+      'Docker + Compose',
+      'Jib (image build)',
+      'GitHub Actions CI/CD',
+      'Kafka 7.5.0',
+      'Redis 7',
+      'MySQL 9.0',
+      'PostgreSQL 16',
+      'MinIO (S3 호환)',
+      'Nginx',
+      'Cloudflare DNS',
+    ],
+  },
+];
+---
+
+<SlideLayout title="Tech Stack" slideNumber={5}>
+  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Tech Stack</h2>
+      <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">사용 기술 전체 목록</p>
+    </div>
+
+    <!-- 4 columns -->
+    <div class="grid grid-cols-4 gap-4">
+      {columns.map((col, i) => (
+        <div
+          class={`glass-card p-4 flex flex-col gap-3 opacity-init anim-fade-up d-${200 + i * 100}`}
+          style={`border-color:${col.color}30;`}
+        >
+          <div class="flex items-center gap-2">
+            <span class="text-lg">{col.icon}</span>
+            <span class="font-['Manrope',sans-serif] font-bold text-base" style={`color:${col.color};`}>{col.title}</span>
+          </div>
+          <div class="h-px" style={`background:linear-gradient(90deg,${col.color}50,transparent);`}></div>
+          <div class="flex flex-wrap gap-1.5">
+            {col.techs.map((t) => (
+              <span class={`badge ${col.badgeClass}`}>{t}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Language summary -->
+    <div class="flex items-center justify-center gap-3 opacity-init anim-fade-up d-600">
+      {[
+        { lang: 'Kotlin', pct: 30, color: '#9333EA' },
+        { lang: 'Java', pct: 40, color: '#61aaff' },
+        { lang: 'Go', pct: 15, color: '#61ffe6' },
+        { lang: 'TypeScript', pct: 15, color: '#ffb964' },
+      ].map((l) => (
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full" style={`background:${l.color};`}></div>
+          <span class="text-sm font-medium text-[#f0dfff]/80">{l.lang}</span>
+          <span class="text-sm" style={`color:${l.color};`}>{l.pct}%</span>
+        </div>
+      ))}
+      <div class="ml-4 h-3 flex rounded-full overflow-hidden w-48">
+        <div style="width:30%;background:#9333EA;"></div>
+        <div style="width:40%;background:#61aaff;"></div>
+        <div style="width:15%;background:#61ffe6;"></div>
+        <div style="width:15%;background:#ffb964;"></div>
+      </div>
+    </div>
+
+  </div>
+</SlideLayout>

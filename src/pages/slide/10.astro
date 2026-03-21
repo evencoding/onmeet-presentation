@@ -1,0 +1,135 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import { Code } from 'astro:components';
+
+const cookieConverterCode = `// CookieServerAuthenticationConverter.kt
+// HttpOnly Cookie → BearerToken 변환
+override fun convert(
+    exchange: ServerWebExchange
+): Mono<Authentication> {
+    return Mono.justOrEmpty(
+        exchange.request.cookies.getFirst("accessToken")
+    )
+    .map { cookie: HttpCookie -> cookie.value }
+    .map { token: String ->
+        BearerTokenAuthenticationToken(token)
+    }
+}`;
+
+const userHeaderCode = `// UserHeaderFilter.kt
+// JWT claims → 다운스트림 서비스 헤더 주입
+val userId = jwt.token.claims["userId"]?.toString() ?: ""
+val request = exchange.request.mutate()
+    .header("X-User-Id", userId)
+    .header("X-User-Email", jwt.token.subject)
+    .header("X-User-Roles",
+        jwt.authorities.joinToString(",") { it.authority })
+    .build()
+return chain.filter(exchange.mutate().request(request).build())`;
+
+const secretFilterCode = `// SecureInternalFilter.kt
+// 내부 서비스 간 X-Gateway-Secret 주입
+override fun filter(
+    exchange: ServerWebExchange,
+    chain: GatewayFilterChain
+): Mono<Void> {
+    val mutatedRequest = exchange.request.mutate()
+        .header("X-Gateway-Secret", gatewaySecret)
+        .build()
+    return chain.filter(
+        exchange.mutate().request(mutatedRequest).build()
+    )
+}`;
+---
+
+<SlideLayout title="gateway-service Code" slideNumber={10}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+        gateway-service — Reactive Security Perimeter
+      </h2>
+      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Kotlin · Spring Cloud Gateway · WebFlux</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
+
+      <!-- Cookie Converter -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">CookieConverter</span>
+          <span class="badge badge-cyan">Reactive</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:200px;">
+          <Code code={cookieConverterCode} lang="kotlin" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2.5">
+          <div class="text-sm font-semibold text-[#61ffe6]">Cookie → Bearer 변환</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            HttpOnly Cookie의 accessToken을 Spring Security BearerToken으로 변환.
+            XSS 방어를 유지하면서 JWT 검증 파이프라인에 연결.
+          </div>
+        </div>
+      </div>
+
+      <!-- User Header Filter -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">UserHeaderFilter</span>
+          <span class="badge badge-purple">JWT Claims</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:200px;">
+          <Code code={userHeaderCode} lang="kotlin" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2.5">
+          <div class="text-sm font-semibold text-[#cc97ff]">User Context 전파</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            JWT claims에서 userId·email·roles를 추출해 X-User-* 헤더로 주입.
+            다운스트림 서비스는 JWT 검증 없이 헤더만 신뢰.
+          </div>
+        </div>
+      </div>
+
+      <!-- Secret Filter -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SecureInternalFilter</span>
+          <span class="badge badge-pink">Internal Auth</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:200px;">
+          <Code code={secretFilterCode} lang="kotlin" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2.5">
+          <div class="text-sm font-semibold text-[#ff95a0]">서비스 간 인증</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            Gateway에서 X-Gateway-Secret을 자동 주입. 내부 서비스는 이
+            헤더 존재 여부로 요청이 Gateway를 통했는지 검증.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Flow summary -->
+    <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
+      <div class="text-sm font-semibold mb-1.5" style="color:#cc97ff;">Request Flow</div>
+      <div class="flex items-center gap-1.5 text-xs">
+        {[
+          'Browser Cookie',
+          'CookieConverter → BearerToken',
+          'NimbusJwtDecoder (JWKS)',
+          'UserHeaderFilter',
+          'SecureInternalFilter',
+          'Downstream Service',
+        ].map((step, i) => (
+          <div class="flex items-center gap-1.5">
+            <span class={i === 0 ? 'text-[#61aaff]' : i === 5 ? 'text-[#61ff96]' : 'text-[#f0dfff]/70'}>{step}</span>
+            {i < 5 && <span class="text-[#533e6d]">→</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</SlideLayout>

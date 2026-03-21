@@ -1,0 +1,110 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+
+const features = [
+  {
+    icon: '🎥',
+    title: '실시간 화상회의',
+    subtitle: 'video-service · Java · LiveKit',
+    color: '#3b82f6',
+    badgeClass: 'badge-blue',
+    items: [
+      'LiveKit WebRTC SFU 기반',
+      'Gallery / Speaker 뷰 전환',
+      '채팅 · 화면 공유',
+      '대기실 (Waiting Room)',
+      'PIP 모드 지원',
+      'Kafka Egress 오디오 레코딩',
+    ],
+  },
+  {
+    icon: '🤖',
+    title: 'AI 회의록 자동 생성',
+    subtitle: 'ai-service · Java · Claude',
+    color: '#9333EA',
+    badgeClass: 'badge-purple',
+    items: [
+      'Silero VAD v4 ONNX 무음 필터링',
+      'OpenAI Whisper STT 세그먼트 변환',
+      'Claude API 구조화 요약',
+      '결정사항 · 액션아이템 추출',
+      'BlockNote 리치 텍스트 에디터',
+      'SSE 실시간 완성 알림',
+    ],
+  },
+  {
+    icon: '🔐',
+    title: '기업급 보안 & 알림',
+    subtitle: 'auth/gateway/notification · Kotlin',
+    color: '#ff95a0',
+    badgeClass: 'badge-pink',
+    items: [
+      'RSA-2048 JWT / JWKS 엔드포인트',
+      'AES-256-GCM 키 암호화',
+      'PBKDF2 600K 반복 KDF',
+      'SSE + FCM 멀티탭 지원',
+      'Kafka 이벤트 기반 알림 발송',
+      'HttpOnly Cookie · X-Gateway-Secret',
+    ],
+  },
+];
+---
+
+<SlideLayout title="Key Features" slideNumber={3}>
+  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Key Features</h2>
+      <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">세 가지 핵심 기능</p>
+    </div>
+
+    <!-- Three feature cards -->
+    <div class="grid grid-cols-3 gap-4">
+      {features.map((f, i) => (
+        <div
+          class={`glass-card p-5 flex flex-col gap-3 opacity-init anim-fade-up d-${200 + i * 150}`}
+          style={`border-color:${f.color}30;`}
+        >
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">{f.icon}</span>
+            <div>
+              <div class="font-['Manrope',sans-serif] font-bold text-base" style="color:#f0dfff;">{f.title}</div>
+              <div class="text-xs" style="color:#f0dfff;opacity:0.5;">{f.subtitle}</div>
+            </div>
+          </div>
+          <div
+            class="h-px w-full"
+            style={`background:linear-gradient(90deg,${f.color}60,transparent);`}
+          ></div>
+          <ul class="flex flex-col gap-1.5">
+            {f.items.map((item) => (
+              <li class="flex items-start gap-2 text-sm" style="color:#f0dfff;opacity:0.8;">
+                <span style={`color:${f.color};margin-top:2px;`}>▸</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <!-- Bottom stat row -->
+    <div class="grid grid-cols-6 gap-2 opacity-init anim-fade-up d-700">
+      {[
+        { value: 'LiveKit', sub: 'SFU WebRTC' },
+        { value: 'Whisper', sub: 'OpenAI STT' },
+        { value: 'Claude', sub: 'AI 요약' },
+        { value: 'Kafka', sub: '이벤트 버스' },
+        { value: 'SSE+FCM', sub: '실시간 알림' },
+        { value: 'RSA+AES', sub: '보안 스택' },
+      ].map((s) => (
+        <div class="glass-card text-center py-2 px-1">
+          <div class="text-sm font-bold gradient-text">{s.value}</div>
+          <div class="text-xs mt-0.5" style="color:#f0dfff;opacity:0.5;">{s.sub}</div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</SlideLayout>

@@ -1,0 +1,141 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import { Code } from 'astro:components';
+
+const mimeCode = `// file_service.go — MIME 스푸핑 방지
+func validateMimeType(fileBytes []byte) error {
+    detectedType := http.DetectContentType(fileBytes)
+    if !isAllowedMimeType(detectedType) {
+        return fmt.Errorf(
+            "detected MIME type not allowed: %s",
+            detectedType,
+        )
+    }
+    return nil
+}
+
+// S3 Key Injection Defense
+func validateS3KeyComponents(
+    ownerType, ownerId string,
+) error {
+    allowed := map[string]bool{
+        "USER": true, "TEAM": true,
+        "COMPANY": true, "MEETING": true,
+    }
+    if !allowed[ownerType] {
+        return errors.New("invalid ownerType")
+    }
+    if !regexp.MustCompile(\`^\d+$\`).MatchString(ownerId) {
+        return errors.New("invalid ownerId")
+    }
+    if strings.Contains(ownerId, "..") ||
+       strings.Contains(ownerId, "/") {
+        return errors.New("path traversal detected")
+    }
+    return nil
+}`;
+
+const uploadCode = `// Semaphore-limited async upload (max 10)
+semaphore := make(chan struct{}, 10)
+
+func (s *FileService) uploadAsync(
+    ctx context.Context, key string, buf []byte,
+) {
+    semaphore <- struct{}{} // acquire
+    go func() {
+        defer func() { <-semaphore }() // release
+        if err := s.s3.Upload(ctx, key, buf); err != nil {
+            log.Printf("upload failed: %v", err)
+        }
+    }()
+}
+
+// Smart cache: <1MB cached, >=1MB streamed
+func (s *FileService) getFile(
+    ctx context.Context, fileId string,
+) ([]byte, error) {
+    if fileSize < 1_000_000 {
+        if cached, found := s.cache.Get(fileId); found {
+            return cached, nil
+        }
+    }
+    return s.s3.Stream(ctx, fileId)
+}`;
+---
+
+<SlideLayout title="file-service Code" slideNumber={14}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+        file-service — High-Performance Go File Server
+      </h2>
+      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Go · Gin · GORM · PostgreSQL · MinIO (S3) · AWS SDK v2</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 opacity-init anim-scale d-200">
+
+      <!-- Security code -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-mono font-bold" style="color:#61ffe6;">file_service.go</span>
+          <span class="badge badge-cyan">Security</span>
+          <span class="badge badge-pink">Injection Defense</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:290px;">
+          <Code code={mimeCode} lang="go" theme="one-dark-pro" />
+        </div>
+      </div>
+
+      <!-- Performance code + cards -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#61ffe6;">upload.go</span>
+          <span class="badge badge-cyan">Semaphore</span>
+          <span class="badge badge-green">Cache</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:190px;">
+          <Code code={uploadCode} lang="go" theme="one-dark-pro" />
+        </div>
+        <!-- Key highlights -->
+        <div class="grid grid-cols-2 gap-1.5">
+          {[
+            { icon: '🕵️', label: 'MIME 바이너리 검사', desc: 'http.DetectContentType()', color: '#61ffe6' },
+            { icon: '🛡️', label: 'S3 Key 인젝션 방어', desc: 'ownerType whitelist + regex', color: '#ff95a0' },
+            { icon: '⚡', label: '세마포어 업로드', desc: 'max 10 goroutines', color: '#ffb964' },
+            { icon: '💨', label: '스마트 캐싱', desc: '<1MB 캐시 / >=1MB 스트리밍', color: '#61ff96' },
+          ].map((h) => (
+            <div class="glass-card px-2.5 py-2 flex items-start gap-2">
+              <span class="text-base">{h.icon}</span>
+              <div>
+                <div class="text-sm font-semibold" style={`color:${h.color};`}>{h.label}</div>
+                <div class="text-xs text-[#f0dfff]/50">{h.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Go vs Kotlin comparison -->
+    <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
+      <div class="flex items-center gap-6">
+        <div class="text-sm font-semibold" style="color:#61ffe6;">Why Go?</div>
+        {[
+          { label: '응답 속도', before: 'Kotlin ~450ms', after: 'Go ~4ms', color: '#61ff96' },
+          { label: '메모리', before: 'JVM ~512MB', after: 'Go ~30MB', color: '#61ffe6' },
+          { label: '동시성', before: 'Thread pool', after: 'goroutines', color: '#ffb964' },
+        ].map((c) => (
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-[#f0dfff]/50">{c.label}:</span>
+            <span class="text-xs line-through text-[#f0dfff]/30">{c.before}</span>
+            <span class="text-sm font-bold" style={`color:${c.color};`}>→ {c.after}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</SlideLayout>

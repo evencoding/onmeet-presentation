@@ -1,0 +1,112 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+
+const pillars = [
+  {
+    icon: '🔑',
+    title: 'Authentication',
+    subtitle: 'auth-service · Kotlin',
+    color: '#cc97ff',
+    items: [
+      { label: 'RSA-2048 키 페어 생성', detail: 'KeyPairGenerator / SecureRandom' },
+      { label: 'AES-256-GCM 개인키 암호화', detail: 'PBKDF2 600K 반복, Salt+IV+CipherText' },
+      { label: 'RS256 JWT 서명', detail: 'JwtTokenProvider · accessToken 30분' },
+      { label: 'JWKS 엔드포인트', detail: '/auth/.well-known/jwks.json 공개 노출' },
+      { label: 'Refresh Token Rotation', detail: 'Redis 저장, 7일 TTL, HttpOnly Cookie' },
+    ],
+  },
+  {
+    icon: '🛡️',
+    title: 'Gateway Security',
+    subtitle: 'gateway-service · Kotlin · WebFlux',
+    color: '#9333EA',
+    items: [
+      { label: 'Cookie→Bearer 변환', detail: 'CookieServerAuthenticationConverter' },
+      { label: 'JWT 검증 (JWKS)', detail: 'NimbusReactiveJwtDecoder' },
+      { label: 'User Header 주입', detail: 'X-User-Id / X-User-Email / X-User-Roles' },
+      { label: 'Gateway Secret', detail: 'X-Gateway-Secret 내부 서비스 인증' },
+      { label: 'Rate Limiting', detail: 'Spring Cloud Gateway RequestRateLimiter' },
+    ],
+  },
+  {
+    icon: '🔒',
+    title: 'Data Security',
+    subtitle: 'file-service · Go · S3',
+    color: '#e197fc',
+    items: [
+      { label: 'MIME 스푸핑 방지', detail: 'http.DetectContentType() 실제 바이너리 검사' },
+      { label: 'S3 Key 인젝션 방어', detail: 'ownerType whitelist + 숫자 ID 검증' },
+      { label: 'Path Traversal 방어', detail: '../ 포함 여부 명시적 체크' },
+      { label: 'Semaphore 업로드 제한', detail: 'chan struct{}{} 최대 10 동시 업로드' },
+      { label: 'Template Traversal 방어', detail: 'email-service ALLOWED_TEMPLATES Set' },
+    ],
+  },
+];
+---
+
+<SlideLayout title="Security Architecture" slideNumber={6}>
+  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Security Architecture</h2>
+      <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">다층 보안 아키텍처 · Defense in Depth</p>
+    </div>
+
+    <!-- Three pillars -->
+    <div class="grid grid-cols-3 gap-4 opacity-init anim-scale d-200">
+      {pillars.map((p, i) => (
+        <div
+          class={`glass-card p-4 flex flex-col gap-3`}
+          style={`border-color:${p.color}30;`}
+        >
+          <div class="flex items-center gap-2">
+            <span class="text-xl">{p.icon}</span>
+            <div>
+              <div class="font-['Manrope',sans-serif] font-bold text-base text-[#f0dfff]">{p.title}</div>
+              <div class="text-xs" style={`color:${p.color};`}>{p.subtitle}</div>
+            </div>
+          </div>
+          <div class="h-px" style={`background:linear-gradient(90deg,${p.color}50,transparent);`}></div>
+          <div class="flex flex-col gap-2">
+            {p.items.map((item) => (
+              <div class="flex flex-col gap-0.5">
+                <div class="flex items-center gap-1.5">
+                  <span style={`color:${p.color};font-size:0.65rem;`}>▸</span>
+                  <span class="text-sm font-medium text-[#f0dfff]">{item.label}</span>
+                </div>
+                <div class="text-xs pl-3.5 text-[#f0dfff]/50">{item.detail}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Request lifecycle flow -->
+    <div class="glass-card p-3 opacity-init anim-fade-up d-500">
+      <div class="text-sm font-semibold mb-2" style="color:#cc97ff;">🔄 Request Lifecycle</div>
+      <div class="flex items-center gap-1.5 flex-wrap">
+        {[
+          { step: 'Browser Cookie', color: '#61aaff' },
+          { step: 'Gateway JWT Validate', color: '#cc97ff' },
+          { step: 'Headers Inject', color: '#9333EA' },
+          { step: 'Service Auth Check', color: '#e197fc' },
+          { step: 'X-Gateway-Secret', color: '#ff95a0' },
+          { step: 'Response', color: '#61ff96' },
+        ].map((s, i) => (
+          <div class="flex items-center gap-1.5">
+            <div
+              class="px-2 py-0.5 rounded text-xs font-medium"
+              style={`background:${s.color}15;border:1px solid ${s.color}40;color:${s.color};`}
+            >
+              {s.step}
+            </div>
+            {i < 5 && <span class="text-[#533e6d] text-xs">→</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</SlideLayout>

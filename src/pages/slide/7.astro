@@ -1,0 +1,93 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+---
+
+<SlideLayout title="Frontend Architecture" slideNumber={7}>
+  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Frontend Architecture</h2>
+      <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">React 18 · TypeScript · Feature-Sliced Design</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+
+      <!-- Left: Architecture diagram -->
+      <div class="glass-card p-4 flex flex-col gap-3 opacity-init anim-fade-left d-200">
+        <div class="text-sm font-semibold" style="color:#cc97ff;">📐 Architecture Layers</div>
+
+        {[
+          { label: 'Pages / Routes', color: '#cc97ff', items: ['HomePage', 'MeetingPage', 'SettingsPage'] },
+          { label: 'Features (Slices)', color: '#9333EA', items: ['auth', 'meeting', 'ai-summary', 'notification'] },
+          { label: 'Shared / UI', color: '#61aaff', items: ['components', 'hooks', 'utils', 'api'] },
+          { label: 'State Management', color: '#61ffe6', items: ['Zustand stores', 'TanStack Query'] },
+          { label: 'API Layer', color: '#ffb964', items: ['axios + interceptors', 'cookie auth'] },
+        ].map((layer) => (
+          <div class="flex items-center gap-2">
+            <div
+              class="w-[6px] h-8 rounded-full flex-shrink-0"
+              style={`background:${layer.color};`}
+            ></div>
+            <div class="flex-1 glass-card px-3 py-1.5" style={`border-color:${layer.color}30;`}>
+              <div class="text-xs font-bold" style={`color:${layer.color};`}>{layer.label}</div>
+              <div class="text-xs text-[#f0dfff]/55 mt-0.5">{layer.items.join(' · ')}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Right: Pattern cards -->
+      <div class="flex flex-col gap-2.5 opacity-init anim-fade-right d-300">
+        {[
+          {
+            icon: '⚡',
+            title: 'Code Splitting & Lazy Loading',
+            color: '#ffb964',
+            items: ['React.lazy() + Suspense', 'Route-level splitting', 'Vite chunk optimization'],
+          },
+          {
+            icon: '📡',
+            title: '실시간 통신',
+            color: '#cc97ff',
+            items: ['LiveKit React SDK (WebRTC)', 'SSE (EventSource) 알림', 'Custom useSSE hook'],
+          },
+          {
+            icon: '🎬',
+            title: '회의 라이프사이클',
+            color: '#9333EA',
+            items: ['대기실 → 입장 → 퇴장 플로우', 'PIP 모드 (Picture-in-Picture)', 'AI 요약 실시간 수신'],
+          },
+          {
+            icon: '🎨',
+            title: 'Design System',
+            color: '#e197fc',
+            items: ['Tailwind CSS v4 커스텀 테마', 'BlockNote 리치 텍스트 에디터', 'Cloudflare Pages 배포'],
+          },
+        ].map((card) => (
+          <div class="glass-card px-3 py-2.5 flex items-start gap-2" style={`border-color:${card.color}30;`}>
+            <span class="text-lg">{card.icon}</span>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-[#f0dfff]">{card.title}</div>
+              <div class="flex flex-wrap gap-x-2 mt-0.5">
+                {card.items.map((item) => (
+                  <span class="text-xs text-[#f0dfff]/55">{item}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+
+    <!-- Tech badges bottom -->
+    <div class="flex flex-wrap gap-1.5 justify-center opacity-init anim-fade-up d-500">
+      {['React 18', 'TypeScript 5', 'Vite', 'Zustand', 'TanStack Query', 'React Router v6',
+        'Tailwind v4', 'BlockNote', 'LiveKit SDK', 'Cloudflare Pages'].map((t) => (
+        <span class="badge badge-blue">{t}</span>
+      ))}
+    </div>
+
+  </div>
+</SlideLayout>

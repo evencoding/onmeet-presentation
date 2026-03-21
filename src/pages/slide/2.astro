@@ -1,0 +1,97 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+
+const services = [
+  { name: 'auth-service',         lang: 'Kotlin', port: ':8081', db: 'MySQL + Redis',   icon: '🔐', color: '#9333EA', badge: 'badge-purple' },
+  { name: 'video-service',        lang: 'Java',   port: ':8083', db: 'MySQL + LiveKit',  icon: '🎥', color: '#3b82f6', badge: 'badge-blue' },
+  { name: 'ai-service',           lang: 'Java',   port: ':8082', db: 'MySQL',            icon: '🤖', color: '#3b82f6', badge: 'badge-blue' },
+  { name: 'notification-service', lang: 'Java',   port: ':8085', db: 'MySQL',            icon: '🔔', color: '#3b82f6', badge: 'badge-blue' },
+  { name: 'file-service',         lang: 'Go',     port: ':8086', db: 'PostgreSQL+MinIO', icon: '📁', color: '#06b6d4', badge: 'badge-cyan' },
+  { name: 'email-service',        lang: 'Java',   port: ':8087', db: 'AWS SES',          icon: '✉️', color: '#3b82f6', badge: 'badge-blue' },
+];
+---
+
+<SlideLayout title="System Architecture" slideNumber={2}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">System Architecture</h2>
+      <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">MSA 기반 마이크로서비스 아키텍처</p>
+    </div>
+
+    <!-- Top flow: Client → Nginx → Gateway -->
+    <div class="flex items-center justify-center gap-2 opacity-init anim-fade-up d-100">
+      {[
+        { label: 'Client', sub: 'React + Vite', color: '#cc97ff' },
+        null,
+        { label: 'Nginx', sub: 'Reverse Proxy', color: '#e197fc' },
+        null,
+        { label: 'Gateway', sub: 'Kotlin · WebFlux · :8080', color: '#9333EA' },
+      ].map((item) =>
+        item === null ? (
+          <div class="pipeline-arrow">→</div>
+        ) : (
+          <div class="glass-card px-3 py-1.5 text-center" style={`border-color:${item.color}40;`}>
+            <div class="text-sm font-semibold" style={`color:${item.color};`}>{item.label}</div>
+            <div class="text-xs" style="color:#f0dfff;opacity:0.55;">{item.sub}</div>
+          </div>
+        )
+      )}
+      <div class="pipeline-arrow">→</div>
+      <div class="glass-card px-3 py-1.5 text-center" style="border-color:#9333EA40;">
+        <div class="text-sm font-semibold" style="color:#9333EA;">JWT Validation</div>
+        <div class="text-xs" style="color:#f0dfff;opacity:0.55;">JWKS · Cookie Auth</div>
+      </div>
+    </div>
+
+    <!-- Arrow down -->
+    <div class="flex justify-center opacity-init anim-fade d-200">
+      <span class="text-[#cc97ff]/60">↓</span>
+    </div>
+
+    <!-- Services grid -->
+    <div class="grid grid-cols-3 gap-2 opacity-init anim-scale d-300">
+      {services.map((s) => (
+        <div
+          class="glass-card p-3 flex items-start gap-2"
+          style={`border-color:${s.color}30;`}
+        >
+          <span class="text-lg mt-0.5">{s.icon}</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-sm font-bold text-[#f0dfff]">{s.name}</span>
+              <span class={`badge ${s.badge}`}>{s.lang}</span>
+            </div>
+            <div class="text-xs mt-0.5" style="color:#f0dfff;opacity:0.5;">{s.db}</div>
+          </div>
+          <span class="text-xs font-mono shrink-0" style="color:#533e6d;">{s.port}</span>
+        </div>
+      ))}
+    </div>
+
+    <!-- Arrow down -->
+    <div class="flex justify-center opacity-init anim-fade d-400">
+      <span class="text-[#cc97ff]/60">↓</span>
+    </div>
+
+    <!-- Infrastructure row -->
+    <div class="grid grid-cols-4 gap-2 opacity-init anim-fade-up d-500">
+      {[
+        { icon: '📨', label: 'Kafka', sub: '이벤트 버스', color: '#ffb964', badge: 'badge-orange' },
+        { icon: '⚡', label: 'Redis', sub: '세션 / 캐시', color: '#61ff96', badge: 'badge-green' },
+        { icon: '🗄️', label: 'MinIO', sub: 'S3 호환 스토리지', color: '#61ffe6', badge: 'badge-cyan' },
+        { icon: '🗃️', label: 'MySQL / PostgreSQL', sub: '서비스별 DB', color: '#61aaff', badge: 'badge-blue' },
+      ].map((i) => (
+        <div class="glass-card px-3 py-2 flex items-center gap-2" style={`border-color:${i.color}30;`}>
+          <span class="text-base">{i.icon}</span>
+          <div>
+            <div class="text-sm font-semibold text-[#f0dfff]">{i.label}</div>
+            <div class="text-xs" style="color:#f0dfff;opacity:0.5;">{i.sub}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</SlideLayout>

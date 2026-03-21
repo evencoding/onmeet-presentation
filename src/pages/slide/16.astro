@@ -1,0 +1,119 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+---
+
+<SlideLayout title="Closing" slideNumber={16}>
+  <div class="w-full max-w-5xl mx-auto px-6 flex flex-col items-center gap-6">
+
+    <!-- Wordmark -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h1
+        class="font-['Manrope',sans-serif] font-extrabold text-[5rem] leading-none tracking-tight text-glow"
+        style="color:#cc97ff;"
+      >
+        Onmeet
+      </h1>
+      <p class="text-xl font-medium mt-2 gradient-text">
+        AI가 회의를 기록하고, 요약하는 화상회의 플랫폼
+      </p>
+      <p class="text-base mt-1 text-[#f0dfff]/60">
+        B2B 기업용 MSA · 실시간 WebRTC · AI 회의록 · 기업급 보안
+      </p>
+    </div>
+
+    <!-- Achievement metrics -->
+    <div class="grid grid-cols-4 gap-4 w-full opacity-init anim-fade-up d-200">
+      {[
+        { value: '7', label: 'Microservices', sub: 'Gateway · Auth · Video · AI · Notification · File · Email', color: '#cc97ff' },
+        { value: '5', label: 'Languages', sub: 'Kotlin · Java · Go · TypeScript · SQL', color: '#e197fc' },
+        { value: '4', label: 'Databases', sub: 'MySQL · PostgreSQL · Redis · MinIO', color: '#9333EA' },
+        { value: '1', label: 'AI Pipeline', sub: 'Silero VAD → Whisper → Claude', color: '#ff95a0' },
+      ].map((m, i) => (
+        <div
+          class={`glass-card-bright p-4 text-center flex flex-col gap-1 opacity-init anim-fade-up d-${300 + i * 100} anim-pulse-glow`}
+          style={`border-color:${m.color}30;`}
+        >
+          <div
+            class="font-['Manrope',sans-serif] font-extrabold text-4xl"
+            style={`color:${m.color};text-shadow:0 0 20px ${m.color}80;`}
+          >
+            {m.value}
+          </div>
+          <div class="font-semibold text-base text-[#f0dfff]">{m.label}</div>
+          <div class="text-xs text-[#f0dfff]/45 leading-snug">{m.sub}</div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Links row -->
+    <div class="flex flex-wrap items-start justify-center gap-6 opacity-init anim-fade-up d-700">
+      <!-- QR Code + Service URL -->
+      <div class="flex flex-col items-center gap-2">
+        <div class="glass-card-bright p-3 rounded-xl">
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://onmeet.cloud&bgcolor=170230&color=cc97ff&format=svg`}
+            alt="onmeet.cloud QR"
+            width="120"
+            height="120"
+            class="rounded"
+          />
+        </div>
+        <span class="text-sm font-medium" style="color:#cc97ff;">onmeet.cloud</span>
+      </div>
+
+      <!-- GitHub & API links -->
+      <div class="flex flex-col gap-2">
+        {[
+          { icon: '🐙', label: 'Backend', url: 'https://github.com/evencoding/onmeet-backend', color: '#cc97ff' },
+          { icon: '🐙', label: 'Frontend', url: 'https://github.com/evencoding/onmeet-frontend', color: '#e197fc' },
+          { icon: '🐙', label: 'Presentation', url: 'https://github.com/evencoding/onmeet-presentation', color: '#9e41f5' },
+          { icon: '📖', label: 'Swagger API Docs', url: 'https://api.onmeet.cloud/swagger-ui.html', color: '#61aaff' },
+        ].map((link) => (
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="glass-card px-4 py-2 flex items-center gap-2 no-underline hover:scale-105 transition-transform"
+            style={`border-color:${link.color}30;`}
+          >
+            <span class="text-base">{link.icon}</span>
+            <span class="text-sm font-medium" style={`color:${link.color};`}>{link.label}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <!-- Thank you + Q&A -->
+    <div class="flex items-center gap-6 opacity-init anim-fade-up d-800">
+      <div class="text-center">
+        <p class="font-['Manrope',sans-serif] font-bold text-4xl gradient-text">Thank You</p>
+        <p class="text-sm text-[#f0dfff]/50 mt-1">발표를 경청해 주셔서 감사합니다</p>
+      </div>
+      <div
+        class="glass-card-bright px-6 py-3 cursor-pointer hover:scale-105 transition-transform"
+        style="border-color:#cc97ff40;"
+      >
+        <span class="font-['Manrope',sans-serif] font-bold text-xl text-glow" style="color:#cc97ff;">Q & A</span>
+        <p class="text-sm text-[#f0dfff]/50 mt-0.5">질문 & 답변</p>
+      </div>
+    </div>
+
+    <!-- Tech cloud -->
+    <div class="flex flex-wrap gap-1.5 justify-center opacity-init anim-fade d-900">
+      {[
+        'Spring Boot', 'Kotlin', 'Java', 'Go', 'React', 'TypeScript',
+        'LiveKit', 'WebRTC', 'Kafka', 'Redis', 'PostgreSQL', 'MySQL',
+        'MinIO', 'Docker', 'GCP', 'GitHub Actions', 'Cloudflare',
+        'Whisper', 'Claude', 'Silero VAD',
+      ].map((t, i) => (
+        <span
+          class="badge"
+          style={`background:rgba(${i % 3 === 0 ? '204,151,255' : i % 3 === 1 ? '97,170,255' : '97,255,230'},0.1);color:${i % 3 === 0 ? '#cc97ff' : i % 3 === 1 ? '#61aaff' : '#61ffe6'};border:1px solid rgba(${i % 3 === 0 ? '204,151,255' : i % 3 === 1 ? '97,170,255' : '97,255,230'},0.25);`}
+        >
+          {t}
+        </span>
+      ))}
+    </div>
+
+  </div>
+</SlideLayout>

@@ -1,0 +1,101 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+---
+
+<SlideLayout title="Hero" slideNumber={1}>
+  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col items-center justify-center gap-5">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h1
+        class="font-['Manrope',sans-serif] font-extrabold text-[4.5rem] leading-none tracking-tight text-glow"
+        style="color:#cc97ff;"
+      >
+        Onmeet
+      </h1>
+      <p class="text-2xl font-semibold mt-2" style="color:#e197fc;">
+        AI가 회의를 기록하고, 요약하는 화상회의 플랫폼
+      </p>
+      <p class="text-base mt-1" style="color:#f0dfff;opacity:0.7;">
+        B2B 기업용 MSA 기반 실시간 화상회의 &middot; AI 회의록 자동 생성 &middot; 실시간 알림
+      </p>
+    </div>
+
+    <!-- Main content: mock conference + stats -->
+    <div class="w-full flex flex-col lg:flex-row items-center gap-6">
+
+      <!-- Mock video conference card -->
+      <div class="glass-card p-4 flex-1 opacity-init anim-fade-left d-200" style="max-width:480px;">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-semibold" style="color:#cc97ff;">● LIVE</span>
+          <span class="text-xs" style="color:#f0dfff;opacity:0.5;">Q1 전략 회의 · 00:42:17</span>
+          <span class="badge badge-purple">4명 참여 중</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          {[
+            { name: '김대표', color: '#9333EA', icon: '👤', active: true },
+            { name: '이팀장', color: '#5b21b6', icon: '👤', active: false },
+            { name: '박개발', color: '#7c3aed', icon: '👤', active: false },
+            { name: '최디자인', color: '#6d28d9', icon: '👤', active: false },
+          ].map((p) => (
+            <div
+              class="relative rounded-lg flex items-end justify-start p-2 overflow-hidden"
+              style={`background:linear-gradient(135deg,${p.color}40,${p.color}20);border:1px solid ${p.color}40;aspect-ratio:16/9;`}
+            >
+              <div class="absolute inset-0 flex items-center justify-center text-3xl opacity-30">{p.icon}</div>
+              <div class="relative z-10 flex items-center gap-1">
+                <div class={`w-1.5 h-1.5 rounded-full ${p.active ? 'bg-green-400' : 'bg-gray-500'}`}></div>
+                <span class="text-xs font-medium text-white/80">{p.name}</span>
+              </div>
+              {p.active && (
+                <div class="absolute top-2 right-2">
+                  <span class="badge badge-green text-xs">발언 중</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div class="mt-3 flex items-center gap-2">
+          <div class="flex-1 h-1 rounded-full bg-[#331557]">
+            <div class="h-1 rounded-full w-2/3" style="background:linear-gradient(90deg,#9333EA,#cc97ff);"></div>
+          </div>
+          <span class="text-xs" style="color:#cc97ff;">AI 요약 중...</span>
+        </div>
+      </div>
+
+      <!-- Right: feature highlights -->
+      <div class="flex-1 flex flex-col gap-3 opacity-init anim-fade-right d-300">
+        {[
+          { icon: '🎥', label: 'WebRTC 실시간 화상회의', sub: 'LiveKit 기반 갤러리/스피커 뷰, 대기실' },
+          { icon: '🤖', label: 'AI 회의록 자동 생성', sub: 'Whisper STT + Claude 요약, 리치 텍스트 에디터' },
+          { icon: '🔔', label: '실시간 알림', sub: 'SSE + FCM, Kafka 이벤트 기반' },
+          { icon: '🔐', label: 'B2B 기업급 보안', sub: 'RSA JWT/JWKS, AES-256-GCM 암호화' },
+        ].map((f, i) => (
+          <div class={`glass-card px-4 py-2.5 flex items-center gap-3 opacity-init anim-fade-right d-${300 + i * 100}`}>
+            <span class="text-2xl">{f.icon}</span>
+            <div>
+              <div class="text-base font-semibold" style="color:#f0dfff;">{f.label}</div>
+              <div class="text-sm" style="color:#f0dfff;opacity:0.55;">{f.sub}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="w-full grid grid-cols-4 gap-3 opacity-init anim-fade-up d-600">
+      {[
+        { value: '7', label: 'Microservices' },
+        { value: '5', label: 'Languages' },
+        { value: 'Real-time', label: 'AI Pipeline' },
+        { value: 'WebRTC', label: '+ LiveKit' },
+      ].map((s) => (
+        <div class="glass-card-bright text-center py-3 px-2 anim-pulse-glow">
+          <div class="font-['Manrope',sans-serif] font-bold text-xl gradient-text">{s.value}</div>
+          <div class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">{s.label}</div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</SlideLayout>

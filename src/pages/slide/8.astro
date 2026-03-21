@@ -1,0 +1,126 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+---
+
+<SlideLayout title="Infrastructure & DevOps" slideNumber={8}>
+  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Infrastructure & DevOps</h2>
+      <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">GCP + Docker + GitHub Actions CI/CD</p>
+    </div>
+
+    <!-- Deployment pipeline -->
+    <div class="glass-card p-4 opacity-init anim-fade-up d-100">
+      <div class="text-sm font-semibold mb-3" style="color:#cc97ff;">🚀 CI/CD Pipeline</div>
+      <div class="flex items-center gap-2 flex-wrap">
+        {[
+          { icon: '👨‍💻', label: 'Developer', sub: 'feature branch' },
+          { icon: '🔀', label: 'PR → develop', sub: 'code review' },
+          { icon: '🏷️', label: 'release/v0.x.0', sub: 'trigger CI/CD' },
+          { icon: '⚙️', label: 'GitHub Actions', sub: '변경 서비스 감지' },
+          { icon: '🐳', label: 'Jib Build', sub: 'Docker image' },
+          { icon: '📦', label: 'Docker Hub', sub: ':v0.x.0 / :latest' },
+          { icon: '☁️', label: 'GCP VM', sub: 'docker compose up' },
+        ].map((s, i) => (
+          <div class="flex items-center gap-1.5">
+            <div class="glass-card px-2.5 py-1.5 text-center">
+              <div class="text-base">{s.icon}</div>
+              <div class="text-xs font-medium text-[#f0dfff]">{s.label}</div>
+              <div class="text-xs text-[#f0dfff]/45">{s.sub}</div>
+            </div>
+            {i < 6 && <span class="text-[#cc97ff]/50 text-xs">→</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- 4 info cards -->
+    <div class="grid grid-cols-4 gap-3 opacity-init anim-scale d-300">
+      {[
+        {
+          icon: '🏗️',
+          title: '배포 전략',
+          color: '#cc97ff',
+          items: [
+            'Jib: Dockerfile 없이 이미지 빌드',
+            'release/* 브랜치 push → 자동 배포',
+            '변경된 서비스만 선택적 빌드',
+            'Semantic Versioning (0.x.y)',
+          ],
+        },
+        {
+          icon: '🌐',
+          title: '네트워크',
+          color: '#61aaff',
+          items: [
+            'Cloudflare DNS Proxy',
+            'api.onmeet.cloud → Nginx → Gateway',
+            'rtc.onmeet.cloud → LiveKit :7880',
+            '/files/ → MinIO :9000',
+          ],
+        },
+        {
+          icon: '📊',
+          title: '인프라',
+          color: '#61ffe6',
+          items: [
+            'GCP e2-standard-4 (4vCPU/16GB)',
+            'Docker Engine 29.3.0',
+            'Docker Compose v5.1.1',
+            'Asia-northeast3 (서울)',
+          ],
+        },
+        {
+          icon: '🌿',
+          title: 'Git Workflow',
+          color: '#61ff96',
+          items: [
+            'main: 프로덕션 안정 버전',
+            'develop: 통합 개발 브랜치',
+            'feat/ONMEET-XX: 기능 개발',
+            'hotfix/v0.x.y: 긴급 수정',
+          ],
+        },
+      ].map((card) => (
+        <div class="glass-card p-3 flex flex-col gap-2" style={`border-color:${card.color}30;`}>
+          <div class="flex items-center gap-1.5">
+            <span class="text-base">{card.icon}</span>
+            <span class="text-sm font-bold" style={`color:${card.color};`}>{card.title}</span>
+          </div>
+          <div class="h-px" style={`background:linear-gradient(90deg,${card.color}40,transparent);`}></div>
+          <div class="flex flex-col gap-1">
+            {card.items.map((item) => (
+              <div class="flex items-start gap-1">
+                <span style={`color:${card.color};font-size:0.6rem;margin-top:2px;`}>▸</span>
+                <span class="text-xs text-[#f0dfff]/70">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Version history -->
+    <div class="glass-card p-3 opacity-init anim-fade-up d-500">
+      <div class="text-sm font-semibold mb-2" style="color:#cc97ff;">📋 Version History</div>
+      <div class="flex items-center gap-4 flex-wrap">
+        {[
+          { v: 'v0.1.0', label: 'MVP', color: '#61aaff' },
+          { v: 'v0.2.0', label: 'AI 기능', color: '#cc97ff' },
+          { v: 'v0.3.0', label: '파일 관리 (Go)', color: '#61ffe6' },
+          { v: 'v0.4.0', label: 'API 통합 정합성', color: '#9333EA' },
+          { v: 'v0.4.8', label: '현재 (Hotfix)', color: '#61ff96' },
+        ].map((s) => (
+          <div class="flex items-center gap-1.5">
+            <div class="w-2 h-2 rounded-full" style={`background:${s.color};`}></div>
+            <span class="text-xs font-mono font-bold" style={`color:${s.color};`}>{s.v}</span>
+            <span class="text-xs text-[#f0dfff]/55">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</SlideLayout>

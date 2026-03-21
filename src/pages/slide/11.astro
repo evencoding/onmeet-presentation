@@ -1,0 +1,142 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import { Code } from 'astro:components';
+
+const webhookCode = `// LiveKitWebhookController.java
+// Track Published → 참여자별 Egress 시작
+case TRACK_PUBLISHED -> {
+    String participantIdentity =
+        event.getParticipant().getIdentity();
+    TrackInfo track = event.getTrack();
+    if (track.getSource() == TrackSource.MICROPHONE) {
+        recordingService.startParticipantTrackEgress(
+            roomName,
+            participantIdentity,
+            track.getSid()
+        );
+    }
+}
+
+case PARTICIPANT_LEFT -> {
+    recordingService.stopParticipantEgress(
+        roomName, participantIdentity
+    );
+    kafkaProducer.publishChunkReady(
+        roomName, participantIdentity
+    );
+}`;
+
+const egressCode = `// RoomRecordingService.java
+// LiveKit TrackEgress S3 저장
+public void startParticipantTrackEgress(
+    String roomName, String identity, String trackSid
+) {
+    TrackEgressRequest req = TrackEgressRequest.newBuilder()
+        .setRoomName(roomName)
+        .setTrackId(trackSid)
+        .setFile(DirectFileOutput.newBuilder()
+            .setFilepath(buildS3Path(roomName, identity))
+            .build())
+        .build();
+    egressClient.startTrackEgress(req);
+    activeEgress.put(identity, req);
+}`;
+
+const jwtCode = `// LiveKitClientImpl.java
+// HS256 JWT (raw HMAC-SHA256)
+private String generateJwt(Map<String, Object> claims) {
+    String header = base64Url(
+        objectMapper.writeValueAsBytes(
+            Map.of("alg","HS256","typ","JWT")));
+    String payload = base64Url(
+        objectMapper.writeValueAsBytes(claims));
+    String sig = hmacSha256(
+        header + "." + payload, apiSecret);
+    return header + "." + payload + "." + sig;
+}`;
+---
+
+<SlideLayout title="video-service Code" slideNumber={11}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+        video-service — LiveKit WebRTC Orchestration
+      </h2>
+      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Java · Spring Boot · LiveKit SDK · Kafka</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
+
+      <!-- Webhook handler -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">WebhookController</span>
+          <span class="badge badge-blue">Webhook</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:230px;">
+          <Code code={webhookCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2">
+          <div class="text-sm font-semibold text-[#61aaff]">WebRTC 이벤트 처리</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            LiveKit 서버 → Webhook → 참여자별 마이크 트랙 Egress 자동 시작.
+            PARTICIPANT_LEFT 시 Kafka audioChunkReady 발행.
+          </div>
+        </div>
+      </div>
+
+      <!-- Egress service -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">RecordingService</span>
+          <span class="badge badge-blue">Egress</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:230px;">
+          <Code code={egressCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2">
+          <div class="text-sm font-semibold text-[#61aaff]">TrackEgress 오케스트레이션</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            참여자 마이크 트랙을 LiveKit Egress API로 S3에 저장.
+            activeEgress Map으로 진행 중인 녹음 관리.
+          </div>
+        </div>
+      </div>
+
+      <!-- JWT generation -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">LiveKitClient</span>
+          <span class="badge badge-blue">HS256 JWT</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:230px;">
+          <Code code={jwtCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2">
+          <div class="text-sm font-semibold text-[#61aaff]">LiveKit Access Token</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            LiveKit API는 HS256 JWT 요구. 외부 라이브러리 없이
+            Raw HMAC-SHA256으로 직접 생성 (의존성 최소화).
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Flow -->
+    <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
+      <div class="text-sm font-semibold mb-1" style="color:#cc97ff;">Recording Flow</div>
+      <div class="flex items-center gap-1.5 text-xs flex-wrap">
+        {['LiveKit Webhook', 'TrackPublished', 'startTrackEgress()', 'S3 OGG 저장', 'ParticipantLeft', 'Kafka: audio-chunk-ready', 'ai-service 소비'].map((s, i) => (
+          <div class="flex items-center gap-1.5">
+            <span class="text-[#f0dfff]/70">{s}</span>
+            {i < 6 && <span class="text-[#533e6d]">→</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</SlideLayout>

@@ -1,0 +1,131 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import { Code } from 'astro:components';
+
+const templateCode = `// EmailService.java — Template Path Traversal Guard
+private static final Set<String> ALLOWED_TEMPLATES =
+    Set.of(
+        "company-invitation",
+        "guest-invitation",
+        "temporary-password"
+    );
+
+public void sendTemplatedEmail(
+    String to,
+    String templateName,
+    Map<String, Object> variables
+) {
+    if (!ALLOWED_TEMPLATES.contains(templateName)) {
+        throw new IllegalArgumentException(
+            "Invalid template: " + templateName
+        );
+    }
+    Context context = new Context();
+    context.setVariables(variables);
+    String body = templateEngine
+        .process(templateName, context);
+    sendEmail(to, resolveSubject(templateName), body);
+}`;
+
+const tokenCode = `// GmailOAuth2TokenService.java
+// Double-checked locking 토큰 캐시 (55분 TTL)
+private volatile String cachedToken;
+private volatile long tokenExpiresAt;
+
+public synchronized String getAccessToken() {
+    if (cachedToken != null
+            && System.currentTimeMillis() < tokenExpiresAt) {
+        return cachedToken; // 캐시 히트
+    }
+    // Google OAuth2 token endpoint 갱신
+    RestTemplate restTemplate = new RestTemplate();
+    Map<String, String> params = Map.of(
+        "client_id", clientId,
+        "client_secret", clientSecret,
+        "refresh_token", refreshToken,
+        "grant_type", "refresh_token"
+    );
+    TokenResponse response = restTemplate.postForObject(
+        GOOGLE_TOKEN_URL, params, TokenResponse.class);
+    cachedToken = response.accessToken();
+    // 55분 TTL (실제 만료 60분보다 짧게 설정)
+    tokenExpiresAt = System.currentTimeMillis()
+        + 55 * 60 * 1000L;
+    return cachedToken;
+}`;
+---
+
+<SlideLayout title="email-service Code" slideNumber={15}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
+
+    <!-- Title -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
+        email-service — Template-based Email + Gmail OAuth2
+      </h2>
+      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Java · Spring Boot · Thymeleaf · Gmail OAuth2 · AWS SES</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 opacity-init anim-scale d-200">
+
+      <!-- Template Guard -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">EmailService.java</span>
+          <span class="badge badge-pink">Path Traversal Guard</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:270px;">
+          <Code code={templateCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2.5">
+          <div class="text-sm font-semibold text-[#ff95a0]">Template 보안</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            ALLOWED_TEMPLATES Set으로 허용된 템플릿만 렌더링.
+            임의 파일 경로 접근(path traversal) 완전 차단.
+            Thymeleaf Context로 변수 안전 바인딩.
+          </div>
+        </div>
+      </div>
+
+      <!-- OAuth2 Token Cache -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">GmailOAuth2TokenService</span>
+          <span class="badge badge-blue">Double-checked</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:270px;">
+          <Code code={tokenCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2.5">
+          <div class="text-sm font-semibold text-[#61aaff]">토큰 캐시 전략</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            volatile + synchronized로 double-checked locking 구현.
+            실제 만료(60분) 전 55분에 선제 갱신으로 레이스 컨디션 방지.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Email templates + highlights -->
+    <div class="grid grid-cols-2 gap-3 opacity-init anim-fade-up d-400">
+      <div class="glass-card p-2.5">
+        <div class="text-sm font-semibold mb-2" style="color:#cc97ff;">📧 Email Templates (Thymeleaf)</div>
+        <div class="flex flex-wrap gap-1.5">
+          {['company-invitation', 'guest-invitation', 'temporary-password'].map((t) => (
+            <span class="badge badge-pink">{t}</span>
+          ))}
+        </div>
+      </div>
+      <div class="glass-card p-2.5">
+        <div class="text-sm font-semibold mb-2" style="color:#cc97ff;">🔑 Key Security Points</div>
+        <div class="flex flex-wrap gap-1.5">
+          {['ALLOWED_TEMPLATES whitelist', 'volatile token cache', 'synchronized refresh', '55min TTL (not 60min)', 'OAuth2 refresh_token'].map((t) => (
+            <span class="badge badge-blue text-xs">{t}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</SlideLayout>
