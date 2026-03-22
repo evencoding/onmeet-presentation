@@ -25,7 +25,7 @@ const features = [
     badgeClass: 'badge-purple',
     items: [
       'Silero VAD v4 ONNX 무음 필터링',
-      'OpenAI Whisper STT 세그먼트 변환',
+      'OpenAI STT 세그먼트 변환',
       'Claude API 구조화 요약',
       '결정사항 · 액션아이템 추출',
       'BlockNote 리치 텍스트 에디터',
@@ -55,8 +55,8 @@ const features = [
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Key Features</h2>
-      <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">세 가지 핵심 기능</p>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Key Features</h1>
+      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">세 가지 핵심 기능</h2>
     </div>
 
     <!-- Three feature cards -->
@@ -90,20 +90,22 @@ const features = [
     </div>
 
     <!-- Bottom stat row -->
-    <div class="grid grid-cols-6 gap-2 opacity-init anim-fade-up d-700">
-      {[
-        { value: 'LiveKit', sub: 'SFU WebRTC' },
-        { value: 'Whisper', sub: 'OpenAI STT' },
-        { value: 'Claude', sub: 'AI 요약' },
-        { value: 'Kafka', sub: '이벤트 버스' },
-        { value: 'SSE+FCM', sub: '실시간 알림' },
-        { value: 'RSA+AES', sub: '보안 스택' },
-      ].map((s) => (
-        <div class="glass-card text-center py-2 px-1">
-          <div class="text-sm font-bold gradient-text">{s.value}</div>
-          <div class="text-xs mt-0.5" style="color:#f0dfff;opacity:0.5;">{s.sub}</div>
-        </div>
-      ))}
+    <div class="stat-row-desktop overflow-x-auto no-swipe opacity-init anim-fade-up d-700 w-full" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+      <div class="stat-row-inner flex items-center gap-2 min-w-max">
+        {[
+          { value: 'LiveKit', sub: 'SFU WebRTC' },
+          { value: 'OpenAI STT', sub: 'gpt-4o-mini-transcribe' },
+          { value: 'Claude', sub: 'AI 요약' },
+          { value: 'Kafka', sub: '이벤트 버스' },
+          { value: 'SSE+FCM', sub: '실시간 알림' },
+          { value: 'RSA+AES', sub: '보안 스택' },
+        ].map((s) => (
+          <div class="glass-card text-center py-2 px-4 shrink-0 flex-1">
+            <div class="text-sm font-bold gradient-text whitespace-nowrap">{s.value}</div>
+            <div class="text-xs mt-0.5 whitespace-nowrap" style="color:#f0dfff;opacity:0.5;">{s.sub}</div>
+          </div>
+        ))}
+      </div>
     </div>
 
   </div>

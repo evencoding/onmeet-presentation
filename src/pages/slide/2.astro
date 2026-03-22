@@ -16,32 +16,34 @@ const services = [
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">System Architecture</h2>
-      <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">MSA 기반 마이크로서비스 아키텍처</p>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">System Architecture</h1>
+      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">MSA 기반 마이크로서비스 아키텍처</h2>
     </div>
 
     <!-- Top flow: Client → Nginx → Gateway -->
-    <div class="flex items-center justify-center gap-2 opacity-init anim-fade-up d-100">
-      {[
-        { label: 'Client', sub: 'React + Vite', color: '#cc97ff' },
-        null,
-        { label: 'Nginx', sub: 'Reverse Proxy', color: '#e197fc' },
-        null,
-        { label: 'Gateway', sub: 'Kotlin · WebFlux · :8080', color: '#9333EA' },
-      ].map((item) =>
-        item === null ? (
-          <div class="pipeline-arrow">→</div>
-        ) : (
-          <div class="glass-card px-3 py-1.5 text-center" style={`border-color:${item.color}40;`}>
-            <div class="text-sm font-semibold" style={`color:${item.color};`}>{item.label}</div>
-            <div class="text-xs" style="color:#f0dfff;opacity:0.55;">{item.sub}</div>
-          </div>
-        )
-      )}
-      <div class="pipeline-arrow">→</div>
-      <div class="glass-card px-3 py-1.5 text-center" style="border-color:#9333EA40;">
-        <div class="text-sm font-semibold" style="color:#9333EA;">JWT Validation</div>
-        <div class="text-xs" style="color:#f0dfff;opacity:0.55;">JWKS · Cookie Auth</div>
+    <div class="overflow-x-auto no-swipe opacity-init anim-fade-up d-100" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+      <div class="flex items-center gap-2 min-w-max px-2 py-1 mx-auto w-fit">
+        {[
+          { label: 'Client', sub: 'React + Vite', color: '#cc97ff' },
+          null,
+          { label: 'Nginx', sub: 'Reverse Proxy', color: '#e197fc' },
+          null,
+          { label: 'Gateway', sub: 'Kotlin · WebFlux · :8080', color: '#9333EA' },
+        ].map((item) =>
+          item === null ? (
+            <div class="pipeline-arrow">→</div>
+          ) : (
+            <div class="glass-card px-3 py-1.5 text-center shrink-0" style={`border-color:${item.color}40;`}>
+              <div class="text-sm font-semibold" style={`color:${item.color};`}>{item.label}</div>
+              <div class="text-xs" style="color:#f0dfff;opacity:0.55;">{item.sub}</div>
+            </div>
+          )
+        )}
+        <div class="pipeline-arrow">→</div>
+        <div class="glass-card px-3 py-1.5 text-center shrink-0" style="border-color:#9333EA40;">
+          <div class="text-sm font-semibold" style="color:#9333EA;">JWT Validation</div>
+          <div class="text-xs" style="color:#f0dfff;opacity:0.55;">JWKS · Cookie Auth</div>
+        </div>
       </div>
     </div>
 
