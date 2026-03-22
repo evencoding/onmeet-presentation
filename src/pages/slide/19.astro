@@ -1,0 +1,77 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import D3Mindmap from '../../components/D3Mindmap.astro';
+---
+
+<SlideLayout title="조예성 회고" slideNumber={19}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col items-center gap-1">
+    <div class="text-center opacity-init anim-fade-up">
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">
+        조예성 — Backend 회고
+      </h1>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">SSE 멀티탭 · FCM 재시도 · 알림 설정 · 장애 대응 · 스케줄링</h2>
+    </div>
+
+    <D3Mindmap
+      centerTitle="Notification"
+      centerSub="SSE • FCM • OPS"
+      branches={[
+        {
+          name: 'SSE 멀티탭',
+          icon: '📡',
+          color: '#61ffe6',
+          leaves: [
+            { icon: '🤔', text: '단일 Map 연결 끊김' },
+            { icon: '💡', text: '이중 Map 구조 전환' },
+            { icon: '💓', text: '30초 heartbeat 정리' },
+          ],
+          result: '멀티탭 동시 알림 완성',
+        },
+        {
+          name: 'FCM 푸시',
+          icon: '📱',
+          color: '#61aaff',
+          leaves: [
+            { icon: '🔄', text: '3회 지수 백오프 재시도' },
+            { icon: '🧹', text: '무효 토큰 자동 삭제' },
+            { icon: '📲', text: 'WEB/AOS/iOS 멀티' },
+          ],
+          result: '이중 채널(SSE+FCM)',
+        },
+        {
+          name: '알림 설정',
+          icon: '⚙️',
+          color: '#9333EA',
+          leaves: [
+            { icon: '🔘', text: '5종 카테고리 토글' },
+            { icon: '🌙', text: 'DND 방해금지 모드' },
+            { icon: '🔕', text: '발송 전 다층 체크' },
+          ],
+          result: '세밀한 알림 제어 구현',
+        },
+        {
+          name: '장애 대응',
+          icon: '🔥',
+          color: '#ff95a0',
+          leaves: [
+            { icon: '🔥', text: '500/503 간헐 에러' },
+            { icon: '⏱️', text: 'RestTemplate 3s/5s' },
+            { icon: '🛡️', text: 'CORS SecurityConfig' },
+          ],
+          result: '스레드 대기+CORS 해결',
+        },
+        {
+          name: '운영 자동화',
+          icon: '🤖',
+          color: '#ffb964',
+          leaves: [
+            { icon: '⏰', text: '10분 주기 예약 발송' },
+            { icon: '🗑️', text: '15일 자동 정리(3AM)' },
+            { icon: '📨', text: 'Kafka DLT 에러 라우팅' },
+          ],
+          result: '무인 운영 시스템 구축',
+        },
+      ]}
+    />
+  </div>
+</SlideLayout>

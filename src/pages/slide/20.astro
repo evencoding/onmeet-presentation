@@ -1,0 +1,77 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import D3Mindmap from '../../components/D3Mindmap.astro';
+---
+
+<SlideLayout title="양진영 회고" slideNumber={20}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col items-center gap-1">
+    <div class="text-center opacity-init anim-fade-up">
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">
+        양진영 — AI Backend 회고
+      </h1>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">파이프라인 진화 · 비용 방어 · 모델 선정 · 포용성 · 무중단 전환</h2>
+    </div>
+
+    <D3Mindmap
+      centerTitle="AI Pipeline"
+      centerSub="VAD • STT • LLM"
+      branches={[
+        {
+          name: '파이프라인 진화',
+          icon: '🔄',
+          color: '#ff95a0',
+          leaves: [
+            { icon: '❌', text: 'Mix STT 화자 분리 불가' },
+            { icon: '🎙️', text: '개별 트랙 분리 구독' },
+            { icon: '🔊', text: 'VAD→ai-service 배치' },
+          ],
+          result: '3 Phase 아키텍처 완성',
+        },
+        {
+          name: '비용 방어',
+          icon: '💰',
+          color: '#61aaff',
+          leaves: [
+            { icon: '💸', text: 'N명 침묵 과금 폭발' },
+            { icon: '🧠', text: 'Silero ONNX 로컬 0원' },
+            { icon: '📊', text: 'PCM 정규화 정밀 필터' },
+          ],
+          result: 'STT 과금 70%+ 방어',
+        },
+        {
+          name: '모델 선정',
+          icon: '🤖',
+          color: '#9333EA',
+          leaves: [
+            { icon: '🔄', text: 'whisper-1→4o-mini' },
+            { icon: '📝', text: 'Claude Strict JSON' },
+            { icon: '⚡', text: '한국어 인식률 극대화' },
+          ],
+          result: 'Multi-LLM 앙상블 체계',
+        },
+        {
+          name: '포용성 설계',
+          icon: '💬',
+          color: '#61ff96',
+          leaves: [
+            { icon: '🔇', text: '채팅 전용 참가자 존재' },
+            { icon: '📊', text: 'Redis ZSET 시간순 병합' },
+            { icon: '🤝', text: '음성+채팅 맥락 통합' },
+          ],
+          result: '소외 없는 회의록 생성',
+        },
+        {
+          name: '무중단 전환',
+          icon: '🛡️',
+          color: '#ffb964',
+          leaves: [
+            { icon: '💾', text: 'S3→DB 정규화 전환' },
+            { icon: '🔄', text: 'Fallback 이중화' },
+            { icon: '📋', text: 'JSON 구조화 적재' },
+          ],
+          result: '기술부채 0 마이그레이션',
+        },
+      ]}
+    />
+  </div>
+</SlideLayout>

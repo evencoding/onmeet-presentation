@@ -1,0 +1,77 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import D3Mindmap from '../../components/D3Mindmap.astro';
+---
+
+<SlideLayout title="최승은 회고" slideNumber={17}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col items-center gap-1">
+    <div class="text-center opacity-init anim-fade-up">
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">
+        최승은 — 팀장 / Full-Stack 회고
+      </h1>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">상태 관리 · SSE 파서 · 디자인 패턴 · 빌드 최적화 · 인증</h2>
+    </div>
+
+    <D3Mindmap
+      centerTitle="Full-Stack"
+      centerSub="STATE • SSE • DX"
+      branches={[
+        {
+          name: '상태 관리 전략',
+          icon: '🧠',
+          color: '#9370DB',
+          leaves: [
+            { icon: '🔥', text: 'STT 리렌더 폭풍' },
+            { icon: '💡', text: 'useRef 버퍼 + Throttle' },
+            { icon: '📊', text: 'Buffer→Throttle→Snapshot' },
+          ],
+          result: '상태별 저장소 분리 체계',
+        },
+        {
+          name: 'SSE 파서 직접 구현',
+          icon: '📡',
+          color: '#61aaff',
+          leaves: [
+            { icon: '❌', text: 'EventSource 헤더 미지원' },
+            { icon: '🔧', text: 'fetch + ReadableStream' },
+            { icon: '🔄', text: '5초 자동 재연결' },
+          ],
+          result: '커스텀 SSE 프로토콜 파서',
+        },
+        {
+          name: '디자인 패턴',
+          icon: '🏗️',
+          color: '#61ff96',
+          leaves: [
+            { icon: '✂️', text: 'VAC 패턴 597→225줄' },
+            { icon: '🪝', text: 'Custom Hooks 추출' },
+            { icon: '🧩', text: 'Compound Components' },
+          ],
+          result: '관심사 분리 + 코드 축소',
+        },
+        {
+          name: '빌드 & 성능',
+          icon: '⚡',
+          color: '#ffb964',
+          leaves: [
+            { icon: '📦', text: 'Manual Chunk Splitting' },
+            { icon: '🖱️', text: 'Route Prefetching' },
+            { icon: '🧹', text: 'console 자동 제거' },
+          ],
+          result: '즉각적 페이지 전환',
+        },
+        {
+          name: '성장 & 교훈',
+          icon: '🌱',
+          color: '#ff95a0',
+          leaves: [
+            { icon: '🔐', text: 'Promise 싱글턴 인증' },
+            { icon: '🧪', text: '253개 테스트 케이스' },
+            { icon: '💭', text: '"왜" 답할 수 있는 힘' },
+          ],
+          result: '도구의 경계를 정하는 능력',
+        },
+      ]}
+    />
+  </div>
+</SlideLayout>

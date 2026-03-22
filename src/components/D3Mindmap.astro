@@ -1,0 +1,363 @@
+---
+interface Branch {
+  name: string;
+  icon: string;
+  color: string;
+  leaves: { icon: string; text: string }[];
+  result: string;
+}
+
+interface Props {
+  centerTitle: string;
+  centerSub: string;
+  branches: Branch[];
+}
+
+const { centerTitle, centerSub, branches } = Astro.props;
+const dataJson = JSON.stringify({ centerTitle, centerSub, branches });
+---
+
+<div class="d3-mindmap-wrapper" data-mindmap={dataJson}>
+  <svg class="d3-mindmap-svg"></svg>
+</div>
+
+<style>
+  .d3-mindmap-wrapper {
+    width: 100%;
+    height: calc(100vh - 180px);
+    max-height: 550px;
+    position: relative;
+  }
+  .d3-mindmap-svg {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  import * as d3 from 'd3';
+
+  interface LeafData { icon: string; text: string; }
+  interface BranchData {
+    name: string;
+    icon: string;
+    color: string;
+    leaves: LeafData[];
+    result: string;
+  }
+  interface MindmapData {
+    centerTitle: string;
+    centerSub: string;
+    branches: BranchData[];
+  }
+
+  function renderMindmap(wrapper: HTMLElement) {
+    const data: MindmapData = JSON.parse(wrapper.dataset.mindmap || '{}');
+    const svg = d3.select(wrapper).select<SVGSVGElement>('.d3-mindmap-svg');
+    svg.selectAll('*').remove();
+
+    const rect = wrapper.getBoundingClientRect();
+    const W = rect.width || 1100;
+    const H = rect.height || 460;
+    const cx = W / 2;
+    const cy = H / 2;
+
+    svg.attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+
+    // Defs: gradient + glow
+    const defs = svg.append('defs');
+    const grad = defs.append('linearGradient').attr('id', 'mm-grad').attr('x1', '0%').attr('x2', '100%');
+    grad.append('stop').attr('offset', '0%').attr('stop-color', '#cc97ff');
+    grad.append('stop').attr('offset', '100%').attr('stop-color', '#e197fc');
+    const filter = defs.append('filter').attr('id', 'mm-glow');
+    filter.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'blur');
+    const merge = filter.append('feMerge');
+    merge.append('feMergeNode').attr('in', 'blur');
+    merge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+    // Dynamic branch positions
+    const n = data.branches.length;
+    const leafDist = Math.min(W * 0.09, 95);
+
+    // Fixed angle layouts: 4=X shape (diagonal 45°), 5=inverted pentagon (point down)
+    const fixedAnglesMap: Record<number, number[]> = {
+      3: [-90, 150, 30],
+      4: [-45, 45, 225, 135],     // X shape: top-right, top-left (error, let me fix)
+      5: [234, 306, 18, 90, 162], // inverted pentagon: starts bottom-left, goes clockwise
+      6: [-30, 30, 90, 150, 210, 330],
+    };
+    // 4 branches: X shape = diagonals at -45, 45, 135, 225 degrees
+    // 5 branches: inverted pentagon = rotate regular pentagon by 180°
+    const degAngles = fixedAnglesMap[n] || Array.from({ length: n }, (_, i) => -90 + (360 / n) * i);
+    const angles = degAngles.map(d => d * Math.PI / 180);
+
+    const branchPositions = angles.map((angle) => {
+      const rx = W * 0.30;
+      const ry = H * 0.30;
+      const bx = cx + Math.cos(angle) * rx;
+      const by = cy + Math.sin(angle) * ry;
+
+      const outAngleDeg = (angle * 180) / Math.PI;
+      const fanSpread = n <= 4 ? 50 : 55;
+      const leafAngles = [
+        outAngleDeg - fanSpread * 1.5,
+        outAngleDeg - fanSpread * 0.5,
+        outAngleDeg + fanSpread * 0.5,
+        outAngleDeg + fanSpread * 1.5,
+      ];
+
+      return { bx, by, leafAngles };
+    });
+
+    // Build all node positions for force simulation
+    interface SimNode extends d3.SimulationNodeDatum {
+      fx?: number | null; fy?: number | null;
+      targetX: number; targetY: number;
+      type: 'center' | 'branch' | 'leaf';
+      branchIdx: number; leafIdx: number;
+      radius: number;
+    }
+
+    const simNodes: SimNode[] = [];
+
+    // Center node (fixed)
+    simNodes.push({ targetX: cx, targetY: cy, x: cx, y: cy, fx: cx, fy: cy, type: 'center', branchIdx: -1, leafIdx: -1, radius: 50 });
+
+    // Branch nodes (fixed)
+    branchPositions.forEach((pos, i) => {
+      simNodes.push({ targetX: pos.bx, targetY: pos.by, x: pos.bx, y: pos.by, fx: pos.bx, fy: pos.by, type: 'branch', branchIdx: i, leafIdx: -1, radius: 45 });
+    });
+
+    // Leaf nodes (movable - force will adjust)
+    branchPositions.forEach((pos, bi) => {
+      pos.leafAngles.forEach((angle, li) => {
+        const rad = (angle * Math.PI) / 180;
+        const tx = pos.bx + Math.cos(rad) * leafDist;
+        const ty = pos.by + Math.sin(rad) * leafDist;
+        simNodes.push({ targetX: tx, targetY: ty, x: tx, y: ty, type: 'leaf', branchIdx: bi, leafIdx: li, radius: 65 });
+      });
+    });
+
+    // Run force simulation to resolve overlaps
+    const simulation = d3.forceSimulation(simNodes)
+      .force('collide', d3.forceCollide<SimNode>().radius(d => d.radius + 8).strength(1).iterations(10))
+      .force('x', d3.forceX<SimNode>(d => d.targetX).strength(0.2))
+      .force('y', d3.forceY<SimNode>(d => d.targetY).strength(0.2))
+      .force('bounds', () => {
+        simNodes.forEach(nd => {
+          if (nd.x !== undefined) nd.x = Math.max(70, Math.min(W - 70, nd.x));
+          if (nd.y !== undefined) nd.y = Math.max(15, Math.min(H - 15, nd.y));
+        });
+      })
+      .stop();
+
+    // Run 300 ticks synchronously for better convergence
+    for (let t = 0; t < 300; t++) simulation.tick();
+
+    // Extract resolved positions
+    const groups = data.branches.map((branch, i) => {
+      const pos = branchPositions[i];
+      const g = svg.append('g').attr('class', 'mm-branch-group').attr('data-index', i);
+
+      const allLeafPositions = simNodes
+        .filter(nd => nd.type === 'leaf' && nd.branchIdx === i)
+        .sort((a, b) => a.leafIdx - b.leafIdx)
+        .map(nd => ({ x: nd.x!, y: nd.y! }));
+
+      return { branch, pos, allLeafPositions, g };
+    });
+
+    // Draw ALL lines first (bottom layer)
+    const linesGroup = svg.append('g').attr('class', 'mm-lines');
+
+    // Main curves from center to branches
+    groups.forEach(({ pos, branch }, i) => {
+      linesGroup.append('line')
+        .attr('x1', cx).attr('y1', cy)
+        .attr('x2', pos.bx).attr('y2', pos.by)
+        .attr('stroke', branch.color)
+        .attr('stroke-width', 3)
+        .attr('opacity', 0.5)
+        .attr('class', `mm-main-line mm-line-${i}`);
+    });
+
+    // Sub lines from branch to all leaves (including result as 4th leaf)
+    groups.forEach(({ pos, allLeafPositions, branch }, i) => {
+      allLeafPositions.forEach(lp => {
+        linesGroup.append('line')
+          .attr('x1', pos.bx).attr('y1', pos.by)
+          .attr('x2', lp.x).attr('y2', lp.y)
+          .attr('stroke', branch.color)
+          .attr('stroke-width', 1.5)
+          .attr('stroke-dasharray', '6 4')
+          .attr('opacity', 0.5)
+          .attr('class', `mm-sub-line mm-line-${i}`);
+      });
+    });
+
+    // Central node
+    const centerGroup = svg.append('g').attr('class', 'mm-center');
+    centerGroup.append('circle')
+      .attr('cx', cx).attr('cy', cy).attr('r', 45)
+      .attr('fill', 'url(#mm-grad)')
+      .attr('stroke', 'rgba(255,255,255,0.1)')
+      .attr('stroke-width', 3);
+    // Glow ring
+    centerGroup.append('circle')
+      .attr('cx', cx).attr('cy', cy).attr('r', 50)
+      .attr('fill', 'none')
+      .attr('stroke', '#cc97ff')
+      .attr('stroke-width', 1)
+      .attr('opacity', 0.3)
+      .attr('class', 'mm-center-glow');
+    centerGroup.append('text')
+      .attr('x', cx).attr('y', cy - 6)
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'white')
+      .attr('font-family', 'Manrope, sans-serif')
+      .attr('font-weight', '700')
+      .attr('font-size', '16px')
+      .text(data.centerTitle);
+    centerGroup.append('text')
+      .attr('x', cx).attr('y', cy + 14)
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'rgba(255,255,255,0.6)')
+      .attr('font-family', 'Inter, sans-serif')
+      .attr('font-size', '9px')
+      .attr('letter-spacing', '2px')
+      .text(data.centerSub);
+
+    // Draw nodes
+    groups.forEach(({ branch, pos, allLeafPositions }, i) => {
+      const nodeGroup = svg.append('g')
+        .attr('class', `mm-node-group mm-nodes-${i}`)
+        .style('cursor', 'pointer');
+
+      // Branch node (pill) - auto-sized
+      const branchG = nodeGroup.append('g').attr('class', 'mm-branch-node');
+      const bLabel = `${branch.icon} ${branch.name}`;
+      const bW = bLabel.length * 8 + 30;
+      const bHalfW = bW / 2;
+      branchG.append('rect')
+        .attr('x', pos.bx - bHalfW).attr('y', pos.by - 16)
+        .attr('width', bW).attr('height', 32)
+        .attr('rx', 16)
+        .attr('fill', 'rgba(43,15,77,0.9)')
+        .attr('stroke', branch.color + '60')
+        .attr('stroke-width', 1);
+      branchG.append('text')
+        .attr('x', pos.bx).attr('y', pos.by + 5)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#f0dfff')
+        .attr('font-family', 'Manrope, sans-serif')
+        .attr('font-weight', '700')
+        .attr('font-size', '11px')
+        .text(bLabel);
+
+      // All leaf nodes (3 normal + 1 result as highlighted leaf)
+      const allItems = [
+        ...branch.leaves.map(l => ({ text: `${l.icon} ${l.text}`, isResult: false })),
+        { text: `✅ ${branch.result}`, isResult: true },
+      ];
+
+      allItems.forEach((item, li) => {
+        const lp = allLeafPositions[li];
+        if (!lp) return;
+        const estW = item.text.length * 6.5 + 20;
+        const halfW = estW / 2;
+        const leafG = nodeGroup.append('g').attr('class', 'mm-leaf');
+
+        if (item.isResult) {
+          // Highlighted result leaf - uses branch color background
+          leafG.append('rect')
+            .attr('x', lp.x - halfW).attr('y', lp.y - 13)
+            .attr('width', estW).attr('height', 26)
+            .attr('rx', 13)
+            .attr('fill', branch.color)
+            .attr('stroke', 'rgba(255,255,255,0.3)')
+            .attr('stroke-width', 1);
+          leafG.append('text')
+            .attr('x', lp.x).attr('y', lp.y + 4)
+            .attr('text-anchor', 'middle')
+            .attr('fill', '#170230')
+            .attr('font-family', 'Inter, sans-serif')
+            .attr('font-weight', '700')
+            .attr('font-size', '10px')
+            .text(item.text);
+        } else {
+          // Normal leaf
+          leafG.append('rect')
+            .attr('x', lp.x - halfW).attr('y', lp.y - 12)
+            .attr('width', estW).attr('height', 24)
+            .attr('rx', 12)
+            .attr('fill', 'rgba(58,26,97,0.6)')
+            .attr('stroke', branch.color + '40')
+            .attr('stroke-width', 1);
+          leafG.append('text')
+            .attr('x', lp.x).attr('y', lp.y + 4)
+            .attr('text-anchor', 'middle')
+            .attr('fill', branch.color)
+            .attr('font-family', 'Inter, sans-serif')
+            .attr('font-size', '10px')
+            .text(item.text);
+        }
+      });
+    });
+
+    // Hover interactions
+    const allNodeGroups = svg.selectAll('.mm-node-group');
+    const allLines = svg.selectAll('.mm-main-line, .mm-sub-line');
+
+    allNodeGroups.each(function (_, i) {
+      const self = d3.select(this);
+      self
+        .on('mouseenter', () => {
+          // Dim all other groups
+          allNodeGroups.each(function (_, j) {
+            if (j !== i) {
+              d3.select(this)
+                .transition().duration(300)
+                .style('opacity', '0.12')
+                .style('filter', 'blur(2px) grayscale(0.8)');
+            }
+          });
+          // Dim center
+          centerGroup.transition().duration(300).style('opacity', '0.3');
+          // Dim non-related lines
+          allLines.each(function () {
+            const el = d3.select(this);
+            const isRelated = el.classed(`mm-line-${i}`);
+            el.transition().duration(300)
+              .style('opacity', isRelated ? '1' : '0.05');
+          });
+        })
+        .on('mouseleave', () => {
+          allNodeGroups.transition().duration(400)
+            .style('opacity', '1')
+            .style('filter', 'none');
+          centerGroup.transition().duration(400).style('opacity', '1');
+          allLines.transition().duration(400).style('opacity', null);
+        });
+    });
+
+    // Center pulse animation
+    function pulseGlow() {
+      svg.select('.mm-center-glow')
+        .transition().duration(1500).ease(d3.easeSinInOut)
+        .attr('r', 68).attr('opacity', 0.5)
+        .transition().duration(1500).ease(d3.easeSinInOut)
+        .attr('r', 60).attr('opacity', 0.2)
+        .on('end', pulseGlow);
+    }
+    pulseGlow();
+  }
+
+  function initAll() {
+    document.querySelectorAll<HTMLElement>('.d3-mindmap-wrapper').forEach(renderMindmap);
+  }
+
+  // Initial + after Astro navigation
+  if (document.readyState === 'complete') initAll();
+  else window.addEventListener('load', initAll);
+  document.addEventListener('astro:after-swap', initAll);
+</script>
