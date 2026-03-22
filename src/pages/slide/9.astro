@@ -58,10 +58,10 @@ fun getJwks(): JwksResponse {
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
-        auth-service — RSA Key Management & JWT
-      </h2>
-      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Kotlin · Spring Security · AES-256-GCM + RS256</p>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-3xl text-glow-sm" style="color:#cc97ff;">
+        인증 서비스의 암호화 전략
+      </h1>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">auth-service · Kotlin · Spring Security · AES-256-GCM + RS256</h2>
     </div>
 
     <div class="grid grid-cols-2 gap-4 opacity-init anim-scale d-200">
@@ -72,7 +72,7 @@ fun getJwks(): JwksResponse {
           <span class="text-xs font-mono font-bold" style="color:#cc97ff;">KeyManager.kt</span>
           <span class="badge badge-purple">AES-256-GCM</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:310px;">
+        <div class="code-block code-scroll" style="max-height:415px;">
           <Code code={keyManagerCode} lang="kotlin" theme="one-dark-pro" />
         </div>
       </div>
@@ -83,23 +83,21 @@ fun getJwks(): JwksResponse {
           <span class="text-xs font-mono font-bold" style="color:#cc97ff;">JwtTokenProvider.kt</span>
           <span class="badge badge-purple">RS256</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:180px;">
+        <div class="code-block code-scroll" style="max-height:250px;">
           <Code code={jwtCode} lang="kotlin" theme="one-dark-pro" />
         </div>
         <!-- Key highlights -->
-        <div class="grid grid-cols-1 gap-1.5">
+        <div class="flex flex-col gap-1.5">
           {[
             { icon: '🔑', label: 'PBKDF2 600K 반복', desc: 'KDF 브루트포스 방어', color: '#cc97ff' },
             { icon: '🧂', label: 'Salt + IV + CipherText', desc: '16+12+N 바이트 구조', color: '#9333EA' },
             { icon: '✍️', label: 'RS256 서명', desc: 'RSA-2048 개인키 서명', color: '#e197fc' },
             { icon: '🌐', label: 'JWKS 공개 노출', desc: 'Gateway NimbusDecoder', color: '#61aaff' },
           ].map((h) => (
-            <div class="glass-card px-3 py-1.5 flex items-center gap-2.5">
-              <span class="text-base">{h.icon}</span>
-              <div>
-                <span class="text-sm font-semibold" style={`color:${h.color};`}>{h.label}</span>
-                <span class="text-xs text-[#f0dfff]/50 ml-2">{h.desc}</span>
-              </div>
+            <div class="glass-card px-3 py-1.5 flex items-center gap-2 whitespace-nowrap">
+              <span class="text-sm">{h.icon}</span>
+              <span class="text-sm font-semibold" style={`color:${h.color};`}>{h.label}</span>
+              <span class="text-xs text-[#f0dfff]/50">{h.desc}</span>
             </div>
           ))}
         </div>

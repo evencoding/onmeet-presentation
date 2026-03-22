@@ -7,7 +7,7 @@ interface Props {
   totalSlides?: number;
 }
 
-const { title, slideNumber, totalSlides = 16 } = Astro.props;
+const { title, slideNumber, totalSlides = 21 } = Astro.props;
 
 const navLinks = [
   { label: 'Home',         href: '/slide/1',  match: [1] },
@@ -19,10 +19,30 @@ const navLinks = [
   { label: 'Frontend',     href: '/slide/7',  match: [7] },
   { label: 'Infra',        href: '/slide/8',  match: [8] },
   { label: 'Code',         href: '/slide/9',  match: [9,10,11,12,13,14,15] },
-  { label: 'Closing',      href: '/slide/16', match: [16] },
+  { label: 'Team',         href: '/slide/16', match: [16,17,18,19,20] },
+  { label: 'Closing',      href: '/slide/21', match: [21] },
 ];
 
 const isActive = (match: number[]) => match.includes(slideNumber);
+
+const isCodeSlide = slideNumber >= 9 && slideNumber <= 15;
+const isTeamSlide = slideNumber >= 16 && slideNumber <= 20;
+const teamSubNav = [
+  { label: '소개',    href: '/slide/16', num: 16 },
+  { label: '최승은',  href: '/slide/17', num: 17 },
+  { label: '박영진',  href: '/slide/18', num: 18 },
+  { label: '조예성',  href: '/slide/19', num: 19 },
+  { label: '양진영',  href: '/slide/20', num: 20 },
+];
+const codeSubNav = [
+  { label: 'auth',         href: '/slide/9',  num: 9 },
+  { label: 'gateway',      href: '/slide/10', num: 10 },
+  { label: 'video',        href: '/slide/11', num: 11 },
+  { label: 'ai',           href: '/slide/12', num: 12 },
+  { label: 'notification', href: '/slide/13', num: 13 },
+  { label: 'file',         href: '/slide/14', num: 14 },
+  { label: 'email',        href: '/slide/15', num: 15 },
+];
 ---
 
 <!doctype html>
@@ -48,12 +68,14 @@ const isActive = (match: number[]) => match.includes(slideNumber);
     </div>
 
     <!-- Top nav -->
-    <nav class="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-8 glass-card-bright rounded-none border-x-0 border-t-0">
+    <nav class="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-8 glass-card-bright rounded-none border-x-0 border-t-0 mobile-nav">
       <a href="/slide/1" class="flex items-center gap-2 no-underline">
         <span class="font-['Manrope',sans-serif] font-extrabold text-xl text-glow-sm" style="color:#cc97ff;">Onmeet</span>
         <span class="text-sm text-[#9e41f5] font-medium hidden sm:inline">Presentation</span>
       </a>
-      <div class="flex items-center gap-1.5 overflow-x-auto">
+
+      <!-- Desktop nav -->
+      <div class="flex items-center gap-1.5 overflow-x-auto nav-links-desktop">
         {navLinks.map((link) => (
           <a
             href={link.href}
@@ -63,10 +85,137 @@ const isActive = (match: number[]) => match.includes(slideNumber);
           </a>
         ))}
       </div>
+
+      <!-- Mobile hamburger button -->
+      <button
+        id="btn-hamburger"
+        class="mobile-hamburger hidden items-center justify-center w-10 h-10 bg-transparent border-none cursor-pointer"
+        aria-label="메뉴 열기"
+      >
+        <div class="hamburger-icon flex flex-col gap-1.5">
+          <span class="block w-6 h-0.5 bg-[#cc97ff] rounded transition-all"></span>
+          <span class="block w-6 h-0.5 bg-[#cc97ff] rounded transition-all"></span>
+          <span class="block w-6 h-0.5 bg-[#cc97ff] rounded transition-all"></span>
+        </div>
+      </button>
     </nav>
 
+    <!-- Mobile menu overlay -->
+    <div id="mobile-menu" class="mobile-menu fixed inset-0 z-[60] hidden" style="background:rgba(23,2,48,0.95);backdrop-filter:blur(20px);">
+      <div class="flex flex-col h-full pt-14">
+        <!-- Close button -->
+        <div class="flex justify-end px-6 py-3">
+          <button id="btn-menu-close" class="text-2xl text-[#cc97ff] bg-transparent border-none cursor-pointer">✕</button>
+        </div>
+
+        <!-- Menu items -->
+        <div class="flex-1 overflow-y-auto px-6 pb-8">
+          <div class="flex flex-col gap-1">
+            {navLinks.map((link) => {
+              const isCode = link.label === 'Code';
+              const isTeam = link.label === 'Team';
+              return (
+                <>
+                  <a
+                    href={link.href}
+                    class={`mobile-menu-link text-lg px-4 py-3 rounded-lg transition-colors no-underline font-medium ${isActive(link.match) ? 'text-[#cc97ff]' : 'text-[#f0dfff]/70'}`}
+                    style={isActive(link.match) ? 'background:rgba(204,151,255,0.1);' : ''}
+                  >
+                    {link.label}
+                    {isCode && isCodeSlide && (
+                      <span class="text-xs text-[#f0dfff]/40 ml-2">({codeSubNav.find(s => s.num === slideNumber)?.label})</span>
+                    )}
+                    {isTeam && isTeamSlide && (
+                      <span class="text-xs text-[#f0dfff]/40 ml-2">({teamSubNav.find(s => s.num === slideNumber)?.label})</span>
+                    )}
+                  </a>
+                  {isCode && (
+                    <div class="flex flex-col gap-0.5 pl-6 mb-1">
+                      {codeSubNav.map((sub) => (
+                        <a
+                          href={sub.href}
+                          class={`mobile-menu-link text-sm px-3 py-2 rounded-md transition-colors no-underline ${
+                            slideNumber === sub.num
+                              ? 'text-[#170230] font-bold'
+                              : 'text-[#f0dfff]/50'
+                          }`}
+                          style={slideNumber === sub.num ? 'background:#cc97ff;' : ''}
+                        >
+                          {sub.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                  {isTeam && (
+                    <div class="flex flex-col gap-0.5 pl-6 mb-1">
+                      {teamSubNav.map((sub) => (
+                        <a
+                          href={sub.href}
+                          class={`mobile-menu-link text-sm px-3 py-2 rounded-md transition-colors no-underline ${
+                            slideNumber === sub.num
+                              ? 'text-[#170230] font-bold'
+                              : 'text-[#f0dfff]/50'
+                          }`}
+                          style={slideNumber === sub.num ? 'background:#cc97ff;' : ''}
+                        >
+                          {sub.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </>
+              );
+            })}
+          </div>
+
+          <!-- Slide counter -->
+          <div class="mt-6 text-center">
+            <span class="text-sm text-[#cc97ff]/60">{slideNumber} / {totalSlides}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code sub-nav (desktop only) -->
+    {isCodeSlide && (
+      <div class="fixed top-14 left-0 right-0 z-40 h-9 flex items-center justify-center gap-1 px-8 code-subnav" style="background:rgba(23,2,48,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(83,62,109,0.2);">
+        {codeSubNav.map((item) => (
+          <a
+            href={item.href}
+            class={`text-xs px-2.5 py-1 rounded-full transition-all no-underline font-medium ${
+              slideNumber === item.num
+                ? 'text-[#170230] font-bold'
+                : 'text-[#f0dfff]/50 hover:text-[#cc97ff]'
+            }`}
+            style={slideNumber === item.num ? 'background:#cc97ff;' : ''}
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+    )}
+
+    <!-- Team sub-nav (desktop only) -->
+    {isTeamSlide && (
+      <div class="fixed top-14 left-0 right-0 z-40 h-9 flex items-center justify-center gap-1 px-8 code-subnav" style="background:rgba(23,2,48,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(83,62,109,0.2);">
+        {teamSubNav.map((item) => (
+          <a
+            href={item.href}
+            class={`text-xs px-2.5 py-1 rounded-full transition-all no-underline font-medium ${
+              slideNumber === item.num
+                ? 'text-[#170230] font-bold'
+                : 'text-[#f0dfff]/50 hover:text-[#cc97ff]'
+            }`}
+            style={slideNumber === item.num ? 'background:#cc97ff;' : ''}
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+    )}
+
     <!-- Slide content -->
-    <main class="relative z-10 h-screen pt-14 pb-12 flex items-center justify-center overflow-hidden">
+    <main class={`relative z-10 h-screen ${isCodeSlide || isTeamSlide ? 'pt-[5.75rem]' : 'pt-14'} pb-12 flex items-center justify-center overflow-hidden`}>
       <slot />
     </main>
 
@@ -82,10 +231,10 @@ const isActive = (match: number[]) => match.includes(slideNumber);
         {slideNumber < totalSlides && (
           <a href={`/slide/${slideNumber + 1}`} class="text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors no-underline">Next →</a>
         )}
-        <span class="text-[#533e6d] hidden sm:inline">|</span>
-        <button id="btn-fullscreen" class="text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors cursor-pointer bg-transparent border-none" title="전체화면 (F)">⛶ 전체화면</button>
-        <button id="btn-pdf" class="text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors cursor-pointer bg-transparent border-none" title="PDF 다운로드">📄 PDF</button>
-        <span class="text-sm text-[#f0dfff]/30 hidden sm:inline ml-1">← → F</span>
+        <span class="text-[#533e6d] hidden sm:inline mobile-hide">|</span>
+        <button id="btn-fullscreen" class="text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors cursor-pointer bg-transparent border-none mobile-hide" title="전체화면 (F)">⛶ 전체화면</button>
+        <button id="btn-pdf" class="text-sm text-[#f0dfff]/50 hover:text-[#cc97ff] transition-colors cursor-pointer bg-transparent border-none mobile-hide" title="PDF 다운로드">📄 PDF</button>
+        <span class="text-sm text-[#f0dfff]/30 hidden sm:inline ml-1 mobile-hide">← → F</span>
       </div>
     </footer>
 
@@ -100,7 +249,7 @@ const isActive = (match: number[]) => match.includes(slideNumber);
     return match ? parseInt(match[1]) : 1;
   }
 
-  const TOTAL = 16;
+  const TOTAL = 21;
 
   function goToSlide(n: number) {
     if (n >= 1 && n <= TOTAL) {
@@ -116,10 +265,38 @@ const isActive = (match: number[]) => match.includes(slideNumber);
     }
   }
 
+  function setupMobileMenu() {
+    const btn = document.getElementById('btn-hamburger');
+    const menu = document.getElementById('mobile-menu');
+    const closeBtn = document.getElementById('btn-menu-close');
+    if (!btn || !menu) return;
+
+    btn.addEventListener('click', () => {
+      menu.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    });
+
+    function closeMenu() {
+      menu.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    closeBtn?.addEventListener('click', closeMenu);
+
+    // Close menu when a link is clicked
+    menu.querySelectorAll('.mobile-menu-link').forEach((link) => {
+      link.addEventListener('click', closeMenu);
+    });
+  }
+
   function setupListeners() {
     const current = getSlideNumber();
 
     document.addEventListener('keydown', (e) => {
+      // Don't navigate if mobile menu is open
+      const menu = document.getElementById('mobile-menu');
+      if (menu && !menu.classList.contains('hidden')) return;
+
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         e.preventDefault();
         goToSlide(getSlideNumber() + 1);
@@ -163,6 +340,41 @@ const isActive = (match: number[]) => match.includes(slideNumber);
         if (btn) btn.textContent = '📄 PDF';
       }, 3000);
     });
+
+    // Touch swipe support for mobile
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let swipeBlocked = false;
+
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+      // Block swipe if touch started inside a .no-swipe element or mobile menu is open
+      const target = e.target as HTMLElement;
+      const menu = document.getElementById('mobile-menu');
+      swipeBlocked = !!target.closest('.no-swipe') || !!target.closest('.code-scroll') || !!target.closest('.code-block') || (!!menu && !menu.classList.contains('hidden'));
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      if (swipeBlocked) return;
+      const touchEndX = e.changedTouches[0].screenX;
+      const touchEndY = e.changedTouches[0].screenY;
+      const diffX = touchStartX - touchEndX;
+      const diffY = touchStartY - touchEndY;
+
+      // Only trigger if horizontal swipe is dominant and minimum 60px
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
+        if (diffX > 0) {
+          // Swipe left → next slide
+          goToSlide(getSlideNumber() + 1);
+        } else {
+          // Swipe right → prev slide
+          goToSlide(getSlideNumber() - 1);
+        }
+      }
+    }, { passive: true });
+
+    setupMobileMenu();
   }
 
   // Run on initial load
