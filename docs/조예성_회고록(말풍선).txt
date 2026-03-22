@@ -1,0 +1,6 @@
+🤔 "SSE를 단일 Map으로 구현했더니, 같은 유저가 탭을 여러 개 열면 이전 연결이 끊기는 문제가 있었어요"
+💡 "Map<UserId, Map<EmitterId, SseEmitter>> 이중 Map 구조로 바꿔서 멀티탭 동시 알림을 해결했습니다"
+🔥 "배포 후 500/503 에러가 간헐적으로 발생 — RestTemplate에 타임아웃이 없어서 auth-service 지연 시 스레드 무한 대기가 원인"
+✅ "connectTimeout 3초, readTimeout 5초 설정 + 기존 fallback 로직으로 해결"
+🔥 "onmeet.cloud에서 notification API 호출 시 CORS 에러 발생 — SecurityConfig에 CORS 설정이 빠져 있었음"
+✅ "Gateway와 동일한 CORS Origin 설정을 notification SecurityConfig에 추가해서 해결"
