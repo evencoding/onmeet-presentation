@@ -61,10 +61,10 @@ private String generateJwt(Map<String, Object> claims) {
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
-        video-service — LiveKit WebRTC Orchestration
-      </h2>
-      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Java · Spring Boot · LiveKit SDK · Kafka</p>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-3xl text-glow-sm" style="color:#cc97ff;">
+        화상회의 녹화 자동화 파이프라인
+      </h1>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">video-service · Java · Spring Boot · LiveKit SDK · Kafka</h2>
     </div>
 
     <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
@@ -126,15 +126,30 @@ private String generateJwt(Map<String, Object> claims) {
     </div>
 
     <!-- Flow -->
-    <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
-      <div class="text-sm font-semibold mb-1" style="color:#cc97ff;">Recording Flow</div>
-      <div class="flex items-center gap-1.5 text-xs flex-wrap">
-        {['LiveKit Webhook', 'TrackPublished', 'startTrackEgress()', 'S3 OGG 저장', 'ParticipantLeft', 'Kafka: audio-chunk-ready', 'ai-service 소비'].map((s, i) => (
-          <div class="flex items-center gap-1.5">
-            <span class="text-[#f0dfff]/70">{s}</span>
-            {i < 6 && <span class="text-[#533e6d]">→</span>}
-          </div>
-        ))}
+    <div class="stat-row-desktop w-full opacity-init anim-fade-up d-400">
+      <div class="text-sm font-semibold mb-1.5" style="color:#cc97ff;">Recording Flow</div>
+      <div class="overflow-x-auto no-swipe" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+        <div class="stat-row-inner flex items-center gap-2 min-w-max">
+          {[
+            { step: '📡 LiveKit Webhook', color: '#61aaff' },
+            { step: '🎙️ TrackPublished', color: '#cc97ff' },
+            { step: '▶️ startTrackEgress()', color: '#9333EA' },
+            { step: '💾 S3 OGG 저장', color: '#e197fc' },
+            { step: '👋 ParticipantLeft', color: '#ff95a0' },
+            { step: '📨 Kafka: audio-chunk-ready', color: '#ffb964' },
+            { step: '🤖 ai-service 소비', color: '#61ff96' },
+          ].map((s, i) => (
+            <div class="flex items-center gap-2 shrink-0 flex-1">
+              <div
+                class="glass-card px-3 py-2 text-xs font-medium whitespace-nowrap text-center flex-1"
+                style={`border-color:${s.color}40;color:${s.color};`}
+              >
+                {s.step}
+              </div>
+              {i < 6 && <span class="text-[#533e6d] text-xs">→</span>}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
 

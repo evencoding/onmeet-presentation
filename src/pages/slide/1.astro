@@ -1,5 +1,12 @@
 ---
 import SlideLayout from '../../layouts/SlideLayout.astro';
+
+const participants = [
+  { name: '대표', img: '/images/meeting/ceo.jpeg', color: '#cc97ff' },
+  { name: '기획', img: '/images/meeting/planner.jpeg', color: '#e197fc' },
+  { name: '개발자', img: '/images/meeting/developer.jpeg', color: '#9333EA' },
+  { name: '디자이너', img: '/images/meeting/designer.jpeg', color: '#61aaff' },
+];
 ---
 
 <SlideLayout title="Hero" slideNumber={1}>
@@ -21,77 +28,47 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
       </p>
     </div>
 
-    <!-- Main content: mock conference + stats -->
+    <!-- Main content: meeting photos + feature highlights -->
     <div class="w-full flex flex-col lg:flex-row items-center gap-6">
 
-      <!-- Mock video conference card -->
+      <!-- Video conference card with real photos -->
       <div class="glass-card p-4 flex-1 opacity-init anim-fade-left d-200" style="max-width:480px;">
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-semibold" style="color:#cc97ff;">● LIVE</span>
           <span class="text-xs" style="color:#f0dfff;opacity:0.5;">Q1 전략 회의 · 00:42:17</span>
           <span class="badge badge-purple">4명 참여 중</span>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          {[
-            { name: '김대표', color: '#9333EA', active: true, gender: 'M', hair: '#1a1a2e', skin: '#f5d0a9', suit: '#2d1b69', accent: '#cc97ff' },
-            { name: '이팀장', color: '#5b21b6', active: false, gender: 'F', hair: '#2d1b3e', skin: '#f0c8a0', suit: '#3b1f7a', accent: '#e197fc' },
-            { name: '박개발', color: '#7c3aed', active: false, gender: 'M', hair: '#0f0f1a', skin: '#e8c49a', suit: '#1e1145', accent: '#9333EA' },
-            { name: '최디자인', color: '#6d28d9', active: false, gender: 'F', hair: '#3d2b1f', skin: '#f2d4b0', suit: '#2a1660', accent: '#cc97ff' },
-          ].map((p) => (
+        <div class="grid grid-cols-2 gap-2" id="meeting-grid">
+          {participants.map((p, i) => (
             <div
-              class="relative rounded-lg flex items-end justify-start p-2 overflow-hidden"
-              style={`background:linear-gradient(135deg,${p.color}40,${p.color}20);border:1px solid ${p.color}40;aspect-ratio:16/9;`}
+              class="meeting-participant relative rounded-lg overflow-hidden transition-all duration-300"
+              data-index={i}
+              style={`aspect-ratio:16/10;filter:brightness(0.6);transform:scale(1);`}
             >
-              <div class="absolute inset-0 flex items-center justify-center">
-                {p.gender === 'M' ? (
-                  <svg viewBox="0 0 120 120" class="w-16 h-16 opacity-70" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="60" cy="42" rx="22" ry="24" fill={p.skin} />
-                    <ellipse cx="60" cy="32" rx="23" ry="16" fill={p.hair} />
-                    <rect x="37" y="30" width="46" height="8" rx="4" fill={p.hair} />
-                    <ellipse cx="51" cy="44" rx="2.5" ry="2.5" fill="#1a1a2e" />
-                    <ellipse cx="69" cy="44" rx="2.5" ry="2.5" fill="#1a1a2e" />
-                    <circle cx="52" cy="43" r="0.8" fill="white" />
-                    <circle cx="70" cy="43" r="0.8" fill="white" />
-                    <path d="M46 38 Q51 35 56 38" stroke={p.hair} stroke-width="1.5" fill="none" />
-                    <path d="M64 38 Q69 35 74 38" stroke={p.hair} stroke-width="1.5" fill="none" />
-                    <path d="M53 55 Q60 59 67 55" stroke="#c4836a" stroke-width="1.2" fill="none" />
-                    <rect x="54" y="64" width="12" height="8" rx="4" fill={p.skin} />
-                    <path d="M30 120 Q30 82 60 72 Q90 82 90 120 Z" fill={p.suit} />
-                    <path d="M50 74 L60 84 L70 74" stroke="white" stroke-width="1.5" fill="none" opacity="0.5" />
-                    <path d="M58 82 L60 100 L62 82 Z" fill={p.accent} opacity="0.8" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 120 120" class="w-16 h-16 opacity-70" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="60" cy="42" rx="21" ry="24" fill={p.skin} />
-                    <ellipse cx="60" cy="34" rx="24" ry="18" fill={p.hair} />
-                    <ellipse cx="38" cy="50" rx="6" ry="16" fill={p.hair} />
-                    <ellipse cx="82" cy="50" rx="6" ry="16" fill={p.hair} />
-                    <ellipse cx="51" cy="44" rx="2.5" ry="3" fill="#1a1a2e" />
-                    <ellipse cx="69" cy="44" rx="2.5" ry="3" fill="#1a1a2e" />
-                    <circle cx="52" cy="43" r="0.8" fill="white" />
-                    <circle cx="70" cy="43" r="0.8" fill="white" />
-                    <path d="M47 41 Q51 39 55 41" stroke={p.hair} stroke-width="1.2" fill="none" />
-                    <path d="M65 41 Q69 39 73 41" stroke={p.hair} stroke-width="1.2" fill="none" />
-                    <path d="M54 55 Q60 59 66 55" stroke="#d4756a" stroke-width="1" fill="#d4756a" opacity="0.3" />
-                    <circle cx="38" cy="52" r="1.5" fill={p.accent} opacity="0.7" />
-                    <circle cx="82" cy="52" r="1.5" fill={p.accent} opacity="0.7" />
-                    <rect x="54" y="64" width="12" height="8" rx="4" fill={p.skin} />
-                    <path d="M30 120 Q30 82 60 72 Q90 82 90 120 Z" fill={p.suit} />
-                    <path d="M48 76 Q60 88 72 76" stroke="white" stroke-width="1" fill="white" opacity="0.12" />
-                    <path d="M50 74 Q60 80 70 74" stroke={p.accent} stroke-width="1" fill="none" opacity="0.6" />
-                    <circle cx="60" cy="78" r="2" fill={p.accent} opacity="0.7" />
-                  </svg>
-                )}
+              <img
+                src={p.img}
+                alt={p.name}
+                class="w-full h-full object-cover"
+              />
+              <!-- Speaking highlight overlay -->
+              <div
+                class="speaking-glow absolute inset-0 rounded-lg pointer-events-none opacity-0 transition-opacity duration-300"
+                style={`box-shadow:inset 0 0 0 3px ${p.color}, 0 0 20px ${p.color}60, 0 0 40px ${p.color}30;`}
+              ></div>
+              <!-- Dim overlay for non-speakers -->
+              <div
+                class="dim-overlay absolute inset-0 rounded-lg pointer-events-none transition-opacity duration-300"
+                style="background:rgba(0,0,0,0.35);"
+              ></div>
+              <!-- Name tag -->
+              <div class="absolute bottom-1.5 left-1.5 z-10 flex items-center gap-1">
+                <div class="speaking-dot w-1.5 h-1.5 rounded-full bg-gray-500"></div>
+                <span class="text-xs font-medium text-white/90 drop-shadow-lg">{p.name}</span>
               </div>
-              <div class="relative z-10 flex items-center gap-1">
-                <div class={`w-1.5 h-1.5 rounded-full ${p.active ? 'bg-green-400' : 'bg-gray-500'}`}></div>
-                <span class="text-xs font-medium text-white/80">{p.name}</span>
+              <!-- Speaking badge -->
+              <div class="speaking-badge absolute top-1.5 right-1.5 opacity-0 transition-opacity duration-300">
+                <span class="badge badge-green text-xs" style="background:rgba(16,185,129,0.7);backdrop-filter:blur(4px);">발언 중</span>
               </div>
-              {p.active && (
-                <div class="absolute top-2 right-2">
-                  <span class="badge badge-green text-xs">발언 중</span>
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -107,7 +84,7 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
       <div class="flex-1 flex flex-col gap-3 opacity-init anim-fade-right d-300">
         {[
           { icon: '🎥', label: 'WebRTC 실시간 화상회의', sub: 'LiveKit 기반 갤러리/스피커 뷰, 대기실' },
-          { icon: '🤖', label: 'AI 회의록 자동 생성', sub: 'Whisper STT + Claude 요약, 리치 텍스트 에디터' },
+          { icon: '🤖', label: 'AI 회의록 자동 생성', sub: 'OpenAI STT + Claude 요약, 리치 텍스트 에디터' },
           { icon: '🔔', label: '실시간 알림', sub: 'SSE + FCM, Kafka 이벤트 기반' },
           { icon: '🔐', label: 'B2B 기업급 보안', sub: 'RSA JWT/JWKS, AES-256-GCM 암호화' },
         ].map((f, i) => (
@@ -157,3 +134,75 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
     animation: ai-pulse 2s ease-in-out infinite;
   }
 </style>
+
+<script>
+  function initSpeakingEffect() {
+    const participants = document.querySelectorAll('.meeting-participant');
+    if (participants.length === 0) return;
+
+    let currentSpeaker = -1;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    function clearSpeaker() {
+      participants.forEach((p) => {
+        const el = p as HTMLElement;
+        const glow = p.querySelector('.speaking-glow') as HTMLElement;
+        const dim = p.querySelector('.dim-overlay') as HTMLElement;
+        const dot = p.querySelector('.speaking-dot') as HTMLElement;
+        const badge = p.querySelector('.speaking-badge') as HTMLElement;
+        if (glow) glow.style.opacity = '0';
+        if (dim) dim.style.opacity = '1';
+        if (dot) { dot.classList.remove('bg-green-400'); dot.classList.add('bg-gray-500'); }
+        if (badge) badge.style.opacity = '0';
+        el.style.filter = 'brightness(0.6)';
+        el.style.transform = 'scale(1)';
+        el.style.zIndex = '0';
+      });
+    }
+
+    function activateSpeaker(index: number) {
+      clearSpeaker();
+      const p = participants[index] as HTMLElement;
+      const glow = p.querySelector('.speaking-glow') as HTMLElement;
+      const dim = p.querySelector('.dim-overlay') as HTMLElement;
+      const dot = p.querySelector('.speaking-dot') as HTMLElement;
+      const badge = p.querySelector('.speaking-badge') as HTMLElement;
+      if (glow) glow.style.opacity = '1';
+      if (dim) dim.style.opacity = '0';
+      if (dot) { dot.classList.remove('bg-gray-500'); dot.classList.add('bg-green-400'); }
+      if (badge) badge.style.opacity = '1';
+      p.style.filter = 'brightness(1)';
+      p.style.transform = 'scale(1.05)';
+      p.style.zIndex = '10';
+      currentSpeaker = index;
+    }
+
+    function nextSpeaker() {
+      // Pick a random speaker different from current
+      let next: number;
+      do {
+        next = Math.floor(Math.random() * participants.length);
+      } while (next === currentSpeaker && participants.length > 1);
+
+      activateSpeaker(next);
+
+      // Random duration: 1~3 seconds
+      const duration = 1000 + Math.random() * 2000;
+      timeoutId = setTimeout(nextSpeaker, duration);
+    }
+
+    // Start after a short delay
+    setTimeout(nextSpeaker, 500);
+
+    // Cleanup on navigation
+    document.addEventListener('astro:before-swap', () => {
+      clearTimeout(timeoutId);
+    }, { once: true });
+  }
+
+  // Run on initial load
+  initSpeakingEffect();
+
+  // Re-run after Astro client-side navigation
+  document.addEventListener('astro:after-swap', initSpeakingEffect);
+</script>

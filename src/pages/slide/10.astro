@@ -47,10 +47,10 @@ override fun filter(
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
-        gateway-service — Reactive Security Perimeter
-      </h2>
-      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Kotlin · Spring Cloud Gateway · WebFlux</p>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-3xl text-glow-sm" style="color:#cc97ff;">
+        모든 요청의 보안 관문 역할
+      </h1>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">gateway-service · Kotlin · Spring Cloud Gateway · WebFlux</h2>
     </div>
 
     <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
@@ -61,10 +61,10 @@ override fun filter(
           <span class="text-xs font-mono font-bold" style="color:#cc97ff;">CookieConverter</span>
           <span class="badge badge-cyan">Reactive</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:200px;">
+        <div class="code-block code-scroll" style="max-height:150px;">
           <Code code={cookieConverterCode} lang="kotlin" theme="one-dark-pro" />
         </div>
-        <div class="glass-card p-2.5">
+        <div class="glass-card p-2.5 flex-1">
           <div class="text-sm font-semibold text-[#61ffe6]">Cookie → Bearer 변환</div>
           <div class="text-xs text-[#f0dfff]/55 mt-1">
             HttpOnly Cookie의 accessToken을 Spring Security BearerToken으로 변환.
@@ -79,10 +79,10 @@ override fun filter(
           <span class="text-xs font-mono font-bold" style="color:#cc97ff;">UserHeaderFilter</span>
           <span class="badge badge-purple">JWT Claims</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:200px;">
+        <div class="code-block code-scroll" style="max-height:150px;">
           <Code code={userHeaderCode} lang="kotlin" theme="one-dark-pro" />
         </div>
-        <div class="glass-card p-2.5">
+        <div class="glass-card p-2.5 flex-1">
           <div class="text-sm font-semibold text-[#cc97ff]">User Context 전파</div>
           <div class="text-xs text-[#f0dfff]/55 mt-1">
             JWT claims에서 userId·email·roles를 추출해 X-User-* 헤더로 주입.
@@ -97,10 +97,10 @@ override fun filter(
           <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SecureInternalFilter</span>
           <span class="badge badge-pink">Internal Auth</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:200px;">
+        <div class="code-block code-scroll" style="max-height:150px;">
           <Code code={secretFilterCode} lang="kotlin" theme="one-dark-pro" />
         </div>
-        <div class="glass-card p-2.5">
+        <div class="glass-card p-2.5 flex-1">
           <div class="text-sm font-semibold text-[#ff95a0]">서비스 간 인증</div>
           <div class="text-xs text-[#f0dfff]/55 mt-1">
             Gateway에서 X-Gateway-Secret을 자동 주입. 내부 서비스는 이
@@ -112,22 +112,29 @@ override fun filter(
     </div>
 
     <!-- Flow summary -->
-    <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
+    <div class="stat-row-desktop w-full opacity-init anim-fade-up d-400">
       <div class="text-sm font-semibold mb-1.5" style="color:#cc97ff;">Request Flow</div>
-      <div class="flex items-center gap-1.5 text-xs">
-        {[
-          'Browser Cookie',
-          'CookieConverter → BearerToken',
-          'NimbusJwtDecoder (JWKS)',
-          'UserHeaderFilter',
-          'SecureInternalFilter',
-          'Downstream Service',
-        ].map((step, i) => (
-          <div class="flex items-center gap-1.5">
-            <span class={i === 0 ? 'text-[#61aaff]' : i === 5 ? 'text-[#61ff96]' : 'text-[#f0dfff]/70'}>{step}</span>
-            {i < 5 && <span class="text-[#533e6d]">→</span>}
-          </div>
-        ))}
+      <div class="overflow-x-auto no-swipe" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+        <div class="stat-row-inner flex items-center gap-2 min-w-max">
+          {[
+            { step: '🍪 Browser Cookie', color: '#61aaff' },
+            { step: '🔄 CookieConverter → BearerToken', color: '#cc97ff' },
+            { step: '✅ NimbusJwtDecoder (JWKS)', color: '#9333EA' },
+            { step: '📋 UserHeaderFilter', color: '#e197fc' },
+            { step: '🔐 SecureInternalFilter', color: '#ff95a0' },
+            { step: '✅ Downstream Service', color: '#61ff96' },
+          ].map((s, i) => (
+            <div class="flex items-center gap-2 shrink-0">
+              <div
+                class="glass-card px-3 py-2 text-xs font-medium whitespace-nowrap text-center flex-1"
+                style={`border-color:${s.color}40;color:${s.color};`}
+              >
+                {s.step}
+              </div>
+              {i < 5 && <span class="text-[#533e6d] text-xs">→</span>}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
 

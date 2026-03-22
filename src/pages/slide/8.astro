@@ -7,32 +7,40 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Infrastructure & DevOps</h2>
-      <p class="text-sm mt-0.5" style="color:#f0dfff;opacity:0.6;">GCP + Docker + GitHub Actions CI/CD</p>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Infrastructure & DevOps</h1>
+      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">GCP + Docker + GitHub Actions CI/CD</h2>
     </div>
 
     <!-- Deployment pipeline -->
     <div class="glass-card p-4 opacity-init anim-fade-up d-100">
       <div class="text-sm font-semibold mb-3" style="color:#cc97ff;">🚀 CI/CD Pipeline</div>
-      <div class="flex items-center gap-2 flex-wrap">
-        {[
-          { icon: '👨‍💻', label: 'Developer', sub: 'feature branch' },
-          { icon: '🔀', label: 'PR → develop', sub: 'code review' },
-          { icon: '🏷️', label: 'release/v0.x.0', sub: 'trigger CI/CD' },
-          { icon: '⚙️', label: 'GitHub Actions', sub: '변경 서비스 감지' },
-          { icon: '🐳', label: 'Jib Build', sub: 'Docker image' },
-          { icon: '📦', label: 'Docker Hub', sub: ':v0.x.0 / :latest' },
-          { icon: '☁️', label: 'GCP VM', sub: 'docker compose up' },
-        ].map((s, i) => (
-          <div class="flex items-center gap-1.5">
-            <div class="glass-card px-2.5 py-1.5 text-center">
-              <div class="text-base">{s.icon}</div>
-              <div class="text-xs font-medium text-[#f0dfff]">{s.label}</div>
-              <div class="text-xs text-[#f0dfff]/45">{s.sub}</div>
+      <div class="overflow-x-auto no-swipe" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+        <div class="flex items-center justify-between min-w-max w-full">
+          {[
+            { icon: '👨‍💻', label: 'Developer', sub: 'feature branch' },
+            { icon: '🔀', label: 'PR → develop', sub: 'code review' },
+            { icon: '🏷️', label: 'release/v0.x.0', sub: 'trigger CI/CD' },
+            { icon: '⚙️', label: 'GitHub Actions', sub: '변경 서비스 감지' },
+            { icon: '🐳', label: 'Jib Build', sub: 'Docker image' },
+            { icon: '📦', label: 'Docker Hub', sub: ':v0.x.0 / :latest' },
+            { icon: '☁️', label: 'GCP VM', sub: 'docker compose up' },
+          ].map((s, i) => (
+            <div class="flex items-center flex-1">
+              <div class="glass-card px-2.5 py-1.5 text-center flex-shrink-0">
+                <div class="text-base">{s.icon}</div>
+                <div class="text-xs font-medium text-[#f0dfff] whitespace-nowrap">{s.label}</div>
+                <div class="text-xs text-[#f0dfff]/45 whitespace-nowrap">{s.sub}</div>
+              </div>
+              {i < 6 && (
+                <div class="flex-1 flex items-center justify-center min-w-4">
+                  <div class="flex-1 h-px mx-1" style="background:linear-gradient(90deg,#cc97ff40,#cc97ff20);"></div>
+                  <span class="text-[#cc97ff]/60 text-xs flex-shrink-0">→</span>
+                  <div class="flex-1 h-px mx-1" style="background:linear-gradient(90deg,#cc97ff20,#cc97ff40);"></div>
+                </div>
+              )}
             </div>
-            {i < 6 && <span class="text-[#cc97ff]/50 text-xs">→</span>}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
 
@@ -44,10 +52,10 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
           title: '배포 전략',
           color: '#cc97ff',
           items: [
-            'Jib: Dockerfile 없이 이미지 빌드',
-            'release/* 브랜치 push → 자동 배포',
-            '변경된 서비스만 선택적 빌드',
-            'Semantic Versioning (0.x.y)',
+            '📦 Jib: Dockerfile 없이 이미지 빌드',
+            '🚀 release/* 브랜치 push → 자동 배포',
+            '🔍 변경된 서비스만 선택적 빌드',
+            '🏷️ Semantic Versioning (0.x.y)',
           ],
         },
         {
@@ -55,10 +63,10 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
           title: '네트워크',
           color: '#61aaff',
           items: [
-            'Cloudflare DNS Proxy',
-            'api.onmeet.cloud → Nginx → Gateway',
-            'rtc.onmeet.cloud → LiveKit :7880',
-            '/files/ → MinIO :9000',
+            '🛡️ Cloudflare DNS Proxy',
+            '🔀 api.onmeet.cloud → Nginx → Gateway',
+            '📹 rtc.onmeet.cloud → LiveKit :7880',
+            '🗃️ /files/ → MinIO :9000',
           ],
         },
         {
@@ -66,10 +74,10 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
           title: '인프라',
           color: '#61ffe6',
           items: [
-            'GCP e2-standard-4 (4vCPU/16GB)',
-            'Docker Engine 29.3.0',
-            'Docker Compose v5.1.1',
-            'Asia-northeast3 (서울)',
+            '☁️ GCP e2-standard-4 (4vCPU/16GB)',
+            '🐳 Docker Engine 29.3.0',
+            '🐳 Docker Compose v5.1.1',
+            '📍 Asia-northeast3 (서울)',
           ],
         },
         {
@@ -77,10 +85,10 @@ import SlideLayout from '../../layouts/SlideLayout.astro';
           title: 'Git Workflow',
           color: '#61ff96',
           items: [
-            'main: 프로덕션 안정 버전',
-            'develop: 통합 개발 브랜치',
-            'feat/ONMEET-XX: 기능 개발',
-            'hotfix/v0.x.y: 긴급 수정',
+            '🟢 main: 프로덕션 안정 버전',
+            '🔵 develop: 통합 개발 브랜치',
+            '🟡 feat/ONMEET-XX: 기능 개발',
+            '🔴 hotfix/v0.x.y: 긴급 수정',
           ],
         },
       ].map((card) => (

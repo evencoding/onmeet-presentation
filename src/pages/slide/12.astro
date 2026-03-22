@@ -58,10 +58,10 @@ String systemPrompt = """
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h2 class="font-['Manrope',sans-serif] font-bold text-2xl text-glow-sm" style="color:#cc97ff;">
-        ai-service — VAD → STT → LLM Pipeline
-      </h2>
-      <p class="text-sm mt-0.5 text-[#f0dfff]/60">Java · Spring Boot · Silero ONNX · Whisper · Claude</p>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-3xl text-glow-sm" style="color:#cc97ff;">
+        음성 → 텍스트 → 회의 요약 AI 파이프라인
+      </h1>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">ai-service · Java · Spring Boot · Silero ONNX · OpenAI STT · Claude</h2>
     </div>
 
     <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
@@ -76,10 +76,10 @@ String systemPrompt = """
           <Code code={vadCode} lang="java" theme="one-dark-pro" />
         </div>
         <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#9333EA]">Silero VAD v4</div>
+          <div class="text-sm font-semibold text-[#9333EA]">Silero VAD v4 — 과금 방어망</div>
           <div class="text-xs text-[#f0dfff]/55 mt-0.5">
-            ONNX Runtime으로 30ms 슬라이딩 윈도우 추론.
-            speech probability &gt; 0.5 구간만 STT로 전달.
+            로컬 ONNX Runtime으로 무음 필터링 (비용 0원).
+            PCM 정규화로 작은 속삭임까지 누락 없이 분석.
           </div>
         </div>
       </div>
@@ -88,16 +88,16 @@ String systemPrompt = """
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
           <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SttWorkerService</span>
-          <span class="badge badge-blue">Whisper</span>
+          <span class="badge badge-blue">OpenAI STT</span>
         </div>
         <div class="code-block code-scroll" style="max-height:220px;">
           <Code code={sttCode} lang="java" theme="one-dark-pro" />
         </div>
         <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#61aaff]">세그먼트별 STT</div>
+          <div class="text-sm font-semibold text-[#61aaff]">gpt-4o-mini-transcribe</div>
           <div class="text-xs text-[#f0dfff]/55 mt-0.5">
-            VAD 세그먼트를 WAV로 인코딩 후 Whisper API 호출.
-            100ms 미만 잡음 자동 스킵. voice-segment Kafka 발행.
+            whisper-1 대비 압도적 한국어 인식률.
+            화자/타임스탬프 정확성 + 비용 절감 동시 달성.
           </div>
         </div>
       </div>
@@ -112,10 +112,10 @@ String systemPrompt = """
           <Code code={claudeCode} lang="java" theme="one-dark-pro" />
         </div>
         <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#61ffe6]">구조화 JSON 출력</div>
+          <div class="text-sm font-semibold text-[#61ffe6]">Claude 3.5 Sonnet — Strict JSON</div>
           <div class="text-xs text-[#f0dfff]/55 mt-0.5">
-            Claude API에 JSON 스키마를 시스템 프롬프트로 강제.
-            description·keywords·decisions·actionItems 추출.
+            프롬프트 엔지니어링으로 순수 JSON 강제 출력.
+            DB 스키마 1:1 매핑 후 역직렬화 검증.
           </div>
         </div>
       </div>
@@ -123,22 +123,29 @@ String systemPrompt = """
     </div>
 
     <!-- Pipeline summary -->
-    <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
-      <div class="flex items-center gap-3 flex-wrap">
-        {[
-          { icon: '📥', label: 'Kafka Consumer', color: '#ffb964' },
-          { icon: '🔊', label: 'S3 오디오 다운로드', color: '#61aaff' },
-          { icon: '🎚️', label: 'Silero VAD 필터링', color: '#cc97ff' },
-          { icon: '📝', label: 'Whisper STT 변환', color: '#9333EA' },
-          { icon: '🤖', label: 'Claude 요약 생성', color: '#e197fc' },
-          { icon: '💾', label: 'file-service 저장 + SSE', color: '#61ff96' },
-        ].map((s, i) => (
-          <div class="flex items-center gap-1.5">
-            <span class="text-xs">{s.icon}</span>
-            <span class="text-xs" style={`color:${s.color};`}>{s.label}</span>
-            {i < 5 && <span class="text-[#533e6d] text-xs">→</span>}
-          </div>
-        ))}
+    <div class="stat-row-desktop w-full opacity-init anim-fade-up d-400">
+      <div class="overflow-x-auto no-swipe" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+        <div class="stat-row-inner flex items-center gap-2 min-w-max">
+          {[
+            { icon: '📥', label: 'Kafka Consumer', color: '#ffb964' },
+            { icon: '🔊', label: 'S3 오디오 다운로드', color: '#61aaff' },
+            { icon: '🎚️', label: 'Silero VAD 필터링', color: '#cc97ff' },
+            { icon: '📝', label: 'OpenAI STT 변환', color: '#9333EA' },
+            { icon: '🤖', label: 'Claude 요약 생성', color: '#e197fc' },
+            { icon: '💾', label: 'file-service 저장 + SSE', color: '#61ff96' },
+          ].map((s, i) => (
+            <div class="flex items-center gap-2 shrink-0 flex-1">
+              <div
+                class="glass-card px-3 py-2 flex items-center gap-1.5 whitespace-nowrap flex-1"
+                style={`border-color:${s.color}40;`}
+              >
+                <span class="text-xs">{s.icon}</span>
+                <span class="text-xs font-medium" style={`color:${s.color};`}>{s.label}</span>
+              </div>
+              {i < 5 && <span class="text-[#533e6d] text-xs">→</span>}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
 

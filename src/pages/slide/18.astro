@@ -1,0 +1,77 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+import D3Mindmap from '../../components/D3Mindmap.astro';
+---
+
+<SlideLayout title="박영진 회고" slideNumber={18}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col items-center gap-1">
+    <div class="text-center opacity-init anim-fade-up">
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">
+        박영진 — Backend Lead 회고
+      </h1>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">MSA 설계 · 인증/Gateway · Go 전환 · 장애 대응 · CI/CD</h2>
+    </div>
+
+    <D3Mindmap
+      centerTitle="Backend Lead"
+      centerSub="MSA • AUTH • OPS"
+      branches={[
+        {
+          name: 'MSA 설계',
+          icon: '🏗️',
+          color: '#61aaff',
+          leaves: [
+            { icon: '🔥', text: '모놀리스 빌드 병목' },
+            { icon: '🔀', text: '7서비스 도메인 분리' },
+            { icon: '📨', text: 'Kafka 이벤트 버스' },
+          ],
+          result: '서비스별 최적 기술 선택',
+        },
+        {
+          name: '인증 & Gateway',
+          icon: '🔐',
+          color: '#9333EA',
+          leaves: [
+            { icon: '🔑', text: 'JWKS 공개키 배포' },
+            { icon: '🍪', text: 'HttpOnly 쿠키 인증' },
+            { icon: '🛡️', text: 'CORS 중앙 관리' },
+          ],
+          result: '비밀키 공유 없는 분산 인증',
+        },
+        {
+          name: 'Go 전환',
+          icon: '🐹',
+          color: '#61ffe6',
+          leaves: [
+            { icon: '🐌', text: 'Java 512MB/200ms' },
+            { icon: '⚡', text: 'Go 50MB/2ms 달성' },
+            { icon: '📦', text: 'Docker 300→20MB' },
+          ],
+          result: 'API 응답 100배 개선',
+        },
+        {
+          name: '장애 대응',
+          icon: '🔥',
+          color: '#ff95a0',
+          leaves: [
+            { icon: '🌐', text: 'Nginx DNS 캐시 502' },
+            { icon: '📧', text: 'email 3중 장애' },
+            { icon: '💥', text: 'DB풀 고갈→전체 전파' },
+          ],
+          result: 'CORS≠CORS 교훈 체득',
+        },
+        {
+          name: 'CI/CD & 인프라',
+          icon: '⚙️',
+          color: '#ffb964',
+          leaves: [
+            { icon: '🔍', text: '변경 서비스만 빌드' },
+            { icon: '🐳', text: 'Jib 레이어 캐싱' },
+            { icon: '📋', text: '17회 릴리즈 경험' },
+          ],
+          result: '510커밋 무중단 배포',
+        },
+      ]}
+    />
+  </div>
+</SlideLayout>

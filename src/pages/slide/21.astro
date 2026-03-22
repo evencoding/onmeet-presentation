@@ -1,0 +1,167 @@
+---
+import SlideLayout from '../../layouts/SlideLayout.astro';
+---
+
+<SlideLayout title="Closing" slideNumber={21}>
+  <div class="w-full max-w-5xl mx-auto px-6 flex flex-col items-center gap-4">
+
+    <!-- Wordmark -->
+    <div class="text-center opacity-init anim-fade-up">
+      <h1
+        class="font-['Manrope',sans-serif] font-extrabold text-[4rem] leading-none tracking-tight text-glow"
+        style="color:#cc97ff;"
+      >
+        Onmeet
+      </h1>
+      <p class="text-lg font-medium mt-1.5 gradient-text">
+        AI가 회의를 기록하고, 요약하는 화상회의 플랫폼
+      </p>
+    </div>
+
+    <!-- Achievement metrics -->
+    <div class="grid grid-cols-4 gap-3 w-full opacity-init anim-fade-up d-200">
+      {[
+        { value: '7', label: 'Microservices', sub: 'Gateway · Auth · Video · AI · Noti · File · Email', color: '#cc97ff' },
+        { value: '5', label: 'Languages', sub: 'Kotlin · Java · Go · TypeScript · SQL', color: '#e197fc' },
+        { value: '4', label: 'Databases', sub: 'MySQL · PostgreSQL · Redis · MinIO', color: '#9333EA' },
+        { value: '1', label: 'AI Pipeline', sub: 'VAD → OpenAI STT → Claude', color: '#ff95a0' },
+      ].map((m, i) => (
+        <div
+          class={`glass-card-bright p-3 text-center flex flex-col gap-0.5 opacity-init anim-fade-up d-${300 + i * 100}`}
+          style={`border-color:${m.color}30;`}
+        >
+          <div
+            class="font-['Manrope',sans-serif] font-extrabold text-3xl"
+            style={`color:${m.color};text-shadow:0 0 20px ${m.color}80;`}
+          >
+            {m.value}
+          </div>
+          <div class="font-semibold text-sm text-[#f0dfff]">{m.label}</div>
+          <div class="text-xs text-[#f0dfff]/45 leading-snug">{m.sub}</div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Links row: PC (QR + links + QR) -->
+    <div class="closing-links flex flex-wrap items-start justify-center gap-5 opacity-init anim-fade-up d-600 desktop-only mt-4">
+      <!-- QR: 서비스 바로가기 -->
+      <a href="https://onmeet.cloud" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center gap-1.5 no-underline hover:scale-105 transition-transform">
+        <div class="glass-card-bright p-2.5 rounded-xl">
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://onmeet.cloud&bgcolor=170230&color=cc97ff&format=svg`}
+            alt="onmeet.cloud QR"
+            width="100"
+            height="100"
+            class="rounded"
+          />
+        </div>
+        <span class="text-sm font-medium" style="color:#cc97ff;">서비스 바로가기</span>
+      </a>
+
+      <!-- GitHub & API links -->
+      <div class="flex flex-col justify-between h-[120px]">
+        {[
+          { icon: '🐙', label: 'Backend', url: 'https://github.com/evencoding/onmeet-backend', color: '#cc97ff' },
+          { icon: '🐙', label: 'Frontend', url: 'https://github.com/evencoding/onmeet-frontend', color: '#e197fc' },
+          { icon: '📖', label: 'Swagger API Docs', url: 'https://api.onmeet.cloud/swagger-ui.html', color: '#61aaff' },
+        ].map((link) => (
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="glass-card px-3 py-1.5 flex items-center gap-2 no-underline hover:scale-105 transition-transform"
+            style={`border-color:${link.color}30;`}
+          >
+            <span class="text-sm">{link.icon}</span>
+            <span class="text-sm font-medium" style={`color:${link.color};`}>{link.label}</span>
+          </a>
+        ))}
+      </div>
+
+      <!-- QR: 발표자료 보기 -->
+      <a class="flex flex-col items-center gap-1.5 no-underline hover:scale-105 transition-transform cursor-pointer">
+        <div class="glass-card-bright p-2.5 rounded-xl">
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://presentation.onmeet.cloud&bgcolor=170230&color=61aaff&format=svg`}
+            alt="Presentation QR"
+            width="100"
+            height="100"
+            class="rounded"
+          />
+        </div>
+        <span class="text-sm font-medium" style="color:#61aaff;">발표자료 보기</span>
+      </a>
+    </div>
+
+    <!-- Links: Mobile (all as link cards) -->
+    <div class="flex flex-col gap-1.5 w-full opacity-init anim-fade-up d-600 mobile-only">
+      {[
+        { icon: '🌐', label: '서비스 바로가기', url: 'https://onmeet.cloud', color: '#cc97ff' },
+        { icon: '🐙', label: 'Backend', url: 'https://github.com/evencoding/onmeet-backend', color: '#cc97ff' },
+        { icon: '🐙', label: 'Frontend', url: 'https://github.com/evencoding/onmeet-frontend', color: '#e197fc' },
+        { icon: '📖', label: 'Swagger API Docs', url: 'https://api.onmeet.cloud/swagger-ui.html', color: '#61aaff' },
+      ].map((link) => (
+        <a
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="glass-card px-4 py-2.5 flex items-center gap-2.5 no-underline hover:scale-105 transition-transform"
+          style={`border-color:${link.color}30;`}
+        >
+          <span class="text-base">{link.icon}</span>
+          <span class="text-sm font-medium" style={`color:${link.color};`}>{link.label}</span>
+        </a>
+      ))}
+    </div>
+
+    <!-- Thank you + Q&A -->
+    <div class="flex items-center gap-6 opacity-init anim-fade-up d-700 my-8">
+      <div class="text-center">
+        <p class="font-['Manrope',sans-serif] font-bold text-5xl gradient-text thankyou-text">Thank You</p>
+        <p class="text-base text-[#f0dfff]/50 mt-1 thankyou-sub">발표를 경청해 주셔서 감사합니다</p>
+      </div>
+      <div
+        class="glass-card-bright px-8 py-4 cursor-pointer hover:scale-105 transition-transform qna-card"
+        style="border-color:#cc97ff40;"
+      >
+        <span class="font-['Manrope',sans-serif] font-bold text-2xl text-glow text-center block qna-text" style="color:#cc97ff;">Q & A</span>
+        <p class="text-sm text-[#f0dfff]/50 mt-0.5 text-center">질문 & 답변</p>
+      </div>
+    </div>
+
+    <!-- Tech cloud -->
+    <div class="flex flex-wrap gap-2.5 justify-center opacity-init anim-fade d-800">
+      {[
+        { name: 'Spring Boot', icon: 'https://cdn.simpleicons.org/springboot/6DB33F' },
+        { name: 'Kotlin', icon: 'https://cdn.simpleicons.org/kotlin/7F52FF' },
+        { name: 'Java', icon: 'https://cdn.simpleicons.org/openjdk/FFFFFF' },
+        { name: 'Go', icon: 'https://cdn.simpleicons.org/go/00ADD8' },
+        { name: 'React', icon: 'https://cdn.simpleicons.org/react/61DAFB' },
+        { name: 'TypeScript', icon: 'https://cdn.simpleicons.org/typescript/3178C6' },
+        { name: 'LiveKit', icon: 'https://cdn.simpleicons.org/livekit/FF2D55' },
+        { name: 'WebRTC', icon: 'https://cdn.simpleicons.org/webrtc/333333' },
+        { name: 'Kafka', icon: 'https://cdn.simpleicons.org/apachekafka/FFFFFF' },
+        { name: 'Redis', icon: 'https://cdn.simpleicons.org/redis/FF4438' },
+        { name: 'PostgreSQL', icon: 'https://cdn.simpleicons.org/postgresql/4169E1' },
+        { name: 'MySQL', icon: 'https://cdn.simpleicons.org/mysql/4479A1' },
+        { name: 'MinIO', icon: 'https://cdn.simpleicons.org/minio/C72E49' },
+        { name: 'Docker', icon: 'https://cdn.simpleicons.org/docker/2496ED' },
+        { name: 'GCP', icon: 'https://cdn.simpleicons.org/googlecloud/4285F4' },
+        { name: 'GitHub Actions', icon: 'https://cdn.simpleicons.org/githubactions/2088FF' },
+        { name: 'Cloudflare', icon: 'https://cdn.simpleicons.org/cloudflare/F38020' },
+        { name: 'OpenAI STT', icon: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/openai.svg' },
+        { name: 'Claude', icon: 'https://cdn.simpleicons.org/anthropic/D4A27F' },
+        { name: 'Silero VAD', icon: 'https://cdn.simpleicons.org/onnx/005CED' },
+      ].map((t, i) => (
+        <span
+          class="badge flex items-center gap-1"
+          style={`background:rgba(${i % 3 === 0 ? '204,151,255' : i % 3 === 1 ? '97,170,255' : '97,255,230'},0.1);color:${i % 3 === 0 ? '#cc97ff' : i % 3 === 1 ? '#61aaff' : '#61ffe6'};border:1px solid rgba(${i % 3 === 0 ? '204,151,255' : i % 3 === 1 ? '97,170,255' : '97,255,230'},0.25);font-size:0.7rem;padding:0.2rem 0.5rem;`}
+        >
+          <img src={t.icon} alt="" class={`w-3 h-3 ${t.icon.includes('jsdelivr') ? 'tech-icon' : ''}`} />
+          {t.name}
+        </span>
+      ))}
+    </div>
+
+  </div>
+</SlideLayout>
