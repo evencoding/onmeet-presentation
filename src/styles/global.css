@@ -75,6 +75,13 @@ html, body {
   font-size: 0.85rem;
   line-height: 1.6;
   overflow: hidden;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* All code-scroll areas block swipe navigation */
+.code-scroll {
+  touch-action: pan-x pan-y;
 }
 
 @keyframes fadeInUp {
@@ -168,6 +175,24 @@ html, body {
   font-size: 0.82rem !important;
   line-height: 1.6 !important;
   tab-size: 2 !important;
+  overflow-x: auto !important;
+  max-width: 100% !important;
+  word-break: keep-all !important;
+}
+
+/* Code slide grids: prevent overflow */
+.grid > .flex-col {
+  min-width: 0;
+}
+
+/* All grid children: equal height within rows */
+.grid > div {
+  display: flex;
+  flex-direction: column;
+}
+.grid > div > .glass-card,
+.grid > div > .glass-card-bright {
+  flex: 1;
 }
 
 /* Nav highlight */
@@ -192,8 +217,212 @@ html, body {
   background-clip: text;
 }
 
+/* Slide 3 stat row: full width on desktop */
+@media (min-width: 769px) {
+  .stat-row-desktop {
+    overflow-x: visible;
+  }
+  .stat-row-inner {
+    min-width: 0 !important;
+    width: 100%;
+  }
+}
+
 /* Fullscreen: scale up content 125% */
 :fullscreen main {
   transform: scale(1.25);
   transform-origin: center center;
+}
+
+/* Tech icons from jsdelivr (black SVGs) need brightness boost */
+img.tech-icon[src*="jsdelivr"] {
+  filter: brightness(0) invert(1);
+}
+
+/* Desktop/Mobile visibility */
+.mobile-only {
+  display: none !important;
+}
+
+/* ===== Mobile View ===== */
+@media (max-width: 768px) {
+  /* Allow vertical scrolling */
+  html, body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+  }
+
+  /* Main content: scrollable, not fixed height */
+  main {
+    height: auto !important;
+    min-height: calc(100vh - 6.5rem);
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-top: 5rem !important;
+    padding-bottom: 4.5rem !important;
+    align-items: flex-start !important;
+  }
+
+  /* Hide fullscreen, PDF, and keyboard hints on mobile */
+  .mobile-hide {
+    display: none !important;
+  }
+
+  /* Compact nav on mobile */
+  .mobile-nav {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Hide desktop nav links */
+  .nav-links-desktop {
+    display: none !important;
+  }
+
+  /* Show hamburger button on mobile */
+  .mobile-hamburger {
+    display: flex !important;
+  }
+
+  /* Hide code sub-nav on mobile (integrated into hamburger menu) */
+  .code-subnav {
+    display: none !important;
+  }
+
+  /* Footer compact on mobile */
+  footer {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Code blocks: allow horizontal scroll */
+  .code-block {
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
+
+  .astro-code {
+    font-size: 0.7rem !important;
+    line-height: 1.4 !important;
+    padding: 0.75rem 0.8rem !important;
+  }
+
+  /* Multi-column grids → single column on mobile */
+  .grid-cols-2:not(#meeting-grid),
+  .grid-cols-3,
+  .grid-cols-4,
+  .grid-cols-5 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Meeting grid: keep 2x2 on mobile */
+  #meeting-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  #meeting-grid .speaking-badge .badge {
+    font-size: 0.6rem !important;
+    padding: 0.1rem 0.4rem !important;
+  }
+
+  /* Allow slide content to wrap naturally */
+  .max-w-6xl,
+  .max-w-5xl {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Prevent all children from overflowing on mobile */
+  .glass-card,
+  .glass-card-bright {
+    max-width: 100% !important;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* Grid items must not overflow */
+  .grid {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .grid > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Closing slide responsive metrics */
+  .glass-card-bright {
+    padding: 0.75rem;
+  }
+
+  /* Smaller title on mobile */
+  h1 {
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-size: 1rem !important;
+  }
+
+  /* Flex row → column on mobile */
+  .flex-row {
+    flex-direction: column !important;
+  }
+
+  /* Increase section gaps on mobile */
+  main .flex.flex-col {
+    gap: 1.5rem !important;
+  }
+
+  /* Show mobile-only, hide desktop-only */
+  .mobile-only {
+    display: flex !important;
+  }
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Why Go: vertical on mobile */
+  .why-go-layout {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Closing slide links: vertical stack on mobile */
+  .closing-links {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 1.5rem !important;
+  }
+
+  /* Horizontal scroll areas: bigger touch target on mobile */
+  .no-swipe {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .no-swipe > div > .shrink-0,
+  .no-swipe > div > div > .shrink-0 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Flow step pills: taller touch area */
+  .no-swipe .rounded {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  /* Stat cards in scroll areas: taller */
+  .no-swipe .glass-card {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
 }
