@@ -9,67 +9,67 @@ import D3Mindmap from '../../components/D3Mindmap.astro';
       <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">
         박영진 — Backend Lead 회고
       </h1>
-      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">MSA 설계 · 인증/Gateway · Go 전환 · 장애 대응 · CI/CD</h2>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">MSA & Gateway · 인증 & 보안 · CI/CD · AI 활용 개발 · 전체 회고</h2>
     </div>
 
     <D3Mindmap
       centerTitle="Backend Lead"
-      centerSub="MSA • AUTH • OPS"
+      centerSub="회고 • 성장"
       branches={[
         {
-          name: 'MSA 설계',
+          name: 'MSA & Gateway',
           icon: '🏗️',
           color: '#61aaff',
           leaves: [
-            { icon: '🔥', text: '모놀리스 빌드 병목' },
             { icon: '🔀', text: '7서비스 도메인 분리' },
-            { icon: '📨', text: 'Kafka 이벤트 버스' },
+            { icon: '🌐', text: 'Gateway 단일 진입점' },
+            { icon: '🐹', text: 'Go 전환 100배 개선' },
           ],
-          result: '서비스별 최적 기술 선택',
+          result: 'Circuit Breaker 부재 → 장애 전파',
         },
         {
-          name: '인증 & Gateway',
+          name: '인증 & 보안',
           icon: '🔐',
           color: '#9333EA',
           leaves: [
-            { icon: '🔑', text: 'JWKS 공개키 배포' },
-            { icon: '🍪', text: 'HttpOnly 쿠키 인증' },
-            { icon: '🛡️', text: 'CORS 중앙 관리' },
+            { icon: '🔑', text: 'JWKS 공개키 분산 인증' },
+            { icon: '🛡️', text: 'MIME·Path Traversal 방어' },
+            { icon: '🍪', text: 'HttpOnly 쿠키 XSS 차단' },
           ],
-          result: '비밀키 공유 없는 분산 인증',
+          result: '키 로테이션·토큰 무효화 미구현',
         },
         {
-          name: 'Go 전환',
-          icon: '🐹',
-          color: '#61ffe6',
-          leaves: [
-            { icon: '🐌', text: 'Java 512MB/200ms' },
-            { icon: '⚡', text: 'Go 50MB/2ms 달성' },
-            { icon: '📦', text: 'Docker 300→20MB' },
-          ],
-          result: 'API 응답 100배 개선',
-        },
-        {
-          name: '장애 대응',
-          icon: '🔥',
-          color: '#ff95a0',
-          leaves: [
-            { icon: '🌐', text: 'Nginx DNS 캐시 502' },
-            { icon: '📧', text: 'email 3중 장애' },
-            { icon: '💥', text: 'DB풀 고갈→전체 전파' },
-          ],
-          result: 'CORS≠CORS 교훈 체득',
-        },
-        {
-          name: 'CI/CD & 인프라',
+          name: 'CI/CD',
           icon: '⚙️',
-          color: '#ffb964',
+          color: '#61ffe6',
           leaves: [
             { icon: '🔍', text: '변경 서비스만 빌드' },
             { icon: '🐳', text: 'Jib 레이어 캐싱' },
-            { icon: '📋', text: '17회 릴리즈 경험' },
+            { icon: '📋', text: '17회 릴리즈·510커밋' },
           ],
-          result: '510커밋 무중단 배포',
+          result: '설정 검증·테스트 자동화 부족',
+        },
+        {
+          name: 'AI 활용 개발',
+          icon: '🤖',
+          color: '#ff95a0',
+          leaves: [
+            { icon: '⚡', text: '반복 작업 위임·속도 향상' },
+            { icon: '⚠️', text: '이해 없는 구현 → 장애' },
+            { icon: '📉', text: '디버깅 역량 약화 우려' },
+          ],
+          result: '도구일 뿐 판단은 개발자 몫',
+        },
+        {
+          name: '전체 회고',
+          icon: '💡',
+          color: '#ffb964',
+          leaves: [
+            { icon: '🏗️', text: '동작 vs 운영 가능한 코드' },
+            { icon: '🔥', text: '장애로 아키텍처 의미 체감' },
+            { icon: '🔧', text: '설정·환경·인프라도 코드' },
+          ],
+          result: 'AI 활용 + 원리 이해 병행',
         },
       ]}
     />
