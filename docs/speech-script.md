@@ -13,11 +13,24 @@ OnMeet은 한 문장으로 말하면, "AI가 회의를 기록하고 요약하는
 기술적으로는 7개의 마이크로서비스, 5개 프로그래밍 언어, 그리고 VAD에서 STT, LLM으로 이어지는 3단계 AI 파이프라인으로 구성되어 있습니다.
 크게 4가지 핵심 축이 있는데요. WebRTC 기반 실시간 화상회의, AI 회의록 자동 생성, SSE와 FCM을 활용한 실시간 알림, 그리고 RSA와 AES 기반의 기업급 보안 아키텍처입니다.
 
-그럼 아키텍처부터 하나씩 살펴보겠습니다.
+그럼 먼저 저희 팀을 소개하겠습니다.
 
 ---
 
-## Slide 2 — System Architecture
+## Slide 2 — Team: 팀 구성 및 역할
+
+OnMeet을 만든 4명의 팀원 소개입니다.
+
+저 최승은은 팀장이자 Full-Stack으로, 프로젝트 총괄과 Video Service 개발, 프론트엔드 전반을 담당했습니다.
+박영진님은 Backend Lead로, MSA 전체 설계와 Auth, Gateway, Notification 서비스 개발, CI/CD 파이프라인 구축, Go 전환 최적화를 리드했습니다.
+조예성님은 Backend로, Notification Service 개발과 Flyway 마이그레이션, 인프라 안정화를 담당했습니다.
+양진영님은 AI Backend로, AI Service 전담으로 STT 음성 인식과 LLM 회의록 생성, AI 파이프라인 전체 구축을 담당했습니다.
+
+4명의 개발자가 7개 마이크로서비스를 5개 언어로 만들었습니다. 그럼 아키텍처부터 하나씩 살펴보겠습니다.
+
+---
+
+## Slide 3 — System Architecture
 
 이 슬라이드는 OnMeet의 전체 시스템 아키텍처입니다.
 
@@ -44,7 +57,7 @@ auth는 auth의 MySQL만, file은 PostgreSQL만 접근합니다.
 
 ---
 
-## Slide 3 — Key Features
+## Slide 4 — Key Features
 
 OnMeet의 세 가지 핵심 기능을 정리한 슬라이드입니다.
 
@@ -67,7 +80,7 @@ RSA-2048 키 페어로 JWT를 서명하고, 개인키 자체를 AES-256-GCM으�
 
 ---
 
-## Slide 4 — AI Pipeline
+## Slide 5 — AI Pipeline
 
 이 슬라이드가 OnMeet의 심장부, AI 파이프라인 전체 흐름도입니다.
 6단계로 구성됩니다.
@@ -104,7 +117,7 @@ DB 스키마와 1대1로 매핑되는 JSON을 뽑아내야 하는 저희 요구�
 
 ---
 
-## Slide 5 — Tech Stack
+## Slide 6 — Tech Stack
 
 사용 기술 전체 목록입니다.
 
@@ -128,10 +141,10 @@ DB는 MySQL 9.0과 PostgreSQL 16, 오브젝트 스토리지는 MinIO, 리버스 
 
 ---
 
-## Slide 6 — Security Architecture
+## Slide 7 — Security Architecture
 
 OnMeet의 다층 보안 아키텍처, Defense in Depth 전략입니다.
-실제 코드는 뒤의 Code 섹션에서 보여드리고, 여기서는 전체 설계를 짚겠습니다.
+실제 코드는 뒤의 Code 섹션(Slide 10~11)에서 보여드리고, 여기서는 전체 설계를 짚겠습니다.
 
 왼쪽의 Authentication부터 보시면, auth-service에서 RSA-2048 키 페어를 생성하고 개인키를 AES-256-GCM으로 암호화해서 저장합니다.
 키 유도에는 PBKDF2를 60만 회 반복하고, RS256으로 JWT를 서명한 뒤 공개키는 JWKS 엔드포인트로 노출합니다.
@@ -142,7 +155,7 @@ HttpOnly Cookie에서 accessToken을 꺼내 Bearer Token으로 변환하고, JWK
 검증 통과 후 JWT claims에서 userId, email, roles를 추출해 X-User 헤더로 주입하므로 다운스트림 서비스들은 JWT를 재파싱할 필요가 없습니다.
 X-Gateway-Secret 헤더도 자동 주입해서 내부 서비스 인증을 처리하고, Rate Limiting도 중앙 관리합니다.
 
-오른쪽 Data Security에서는, file-service의 Go 코드에서 MIME 스푸핑 방지를 위한 바이너리 검사, S3 Key 인젝션 방어, Path Traversal 방어, 
+오른쪽 Data Security에서는, file-service의 Go 코드에서 MIME 스푸핑 방지를 위한 바이너리 검사, S3 Key 인젝션 방어, Path Traversal 방어,
 Semaphore 기반 동시 업로드 제한, 그리고 email-service의 Template Traversal 방어까지 구현했습니다.
 
 하단의 Request Lifecycle 플로우를 보시면, Browser Cookie에서 시작해서 Gateway JWT 검증, Headers 주입,
@@ -150,7 +163,7 @@ Service Auth Check, X-Gateway-Secret 확인을 거쳐 응답이 나가는 전체
 
 ---
 
-## Slide 7 — Frontend Architecture
+## Slide 8 — Frontend Architecture
 
 프론트엔드 아키텍처입니다.
 여기서는 구조와 기술 선택 결과를 중심으로 설명드리고, 각각의 고민과 의사결정 과정은 제 회고 슬라이드에서 상세히 다루겠습니다.
@@ -176,7 +189,7 @@ PWA도 지원해서 정적 에셋 Precaching, API NetworkFirst 캐싱, 오프라
 
 ---
 
-## Slide 8 — Infrastructure & DevOps
+## Slide 9 — Infrastructure & DevOps
 
 GCP와 Docker, GitHub Actions 기반 CI/CD 파이프라인입니다.
 
@@ -195,7 +208,7 @@ Git Workflow는 main, develop, feature, hotfix 네 가지 브랜치 전략을 �
 
 ---
 
-## Slide 9 — Code: 인증 서비스의 암호화 전략
+## Slide 10 — Code: 인증 서비스의 암호화 전략
 
 여기서부터 Code 섹션입니다.
 앞서 보안 아키텍처 슬라이드에서 전체 설계를 보여드렸는데, 여기서는 실제 구현 코드를 보시겠습니다.
@@ -214,7 +227,7 @@ keyManager.getPrivateKey가 호출되면 위의 AES-GCM 복호화가 투명하�
 
 ---
 
-## Slide 10 — Code: Gateway 보안 관문
+## Slide 11 — Code: Gateway 보안 관문
 
 앞서 보안 슬라이드에서 소개한 Gateway의 실제 필터 체인 코드입니다.
 
@@ -233,7 +246,7 @@ UserHeaderFilter, SecureInternalFilter를 거쳐 성공 응답으로 이어지�
 
 ---
 
-## Slide 11 — Code: 화상회의 녹화 자동화 파이프라인
+## Slide 12 — Code: 화상회의 녹화 자동화 파이프라인
 
 AI 파이프라인 슬라이드에서 설명드린 Audio Capture 단계의 실제 구현 코드입니다.
 
@@ -251,7 +264,7 @@ base64Url 인코딩과 HMAC 서명까지 순수 Java 코드로 구현해서 의�
 
 ---
 
-## Slide 12 — Code: 음성에서 텍스트, 회의 요약까지의 AI 파이프라인
+## Slide 13 — Code: 음성에서 텍스트, 회의 요약까지의 AI 파이프라인
 
 AI 파이프라인의 3대 핵심 모델 구현 코드입니다.
 
@@ -271,7 +284,7 @@ PCM 오디오 정규화도 적용해서 마이크 볼륨이 달라도 작은 속
 
 ---
 
-## Slide 13 — Code: 웹과 모바일 실시간 알림 이중 채널
+## Slide 14 — Code: 웹과 모바일 실시간 알림 이중 채널
 
 notification-service의 SSE와 FCM 이중 채널 구현입니다.
 
@@ -285,7 +298,7 @@ Notification Toggle은 사용자별로 회의, 팀, 회의록 3가지 카테고�
 
 ---
 
-## Slide 14 — Code: 왜 Go를 썼는지, 보안까지 잡은 파일 서버
+## Slide 15 — Code: 왜 Go를 썼는지, 보안까지 잡은 파일 서버
 
 file-service의 Go 전환 기술 선택과 결과입니다.
 
@@ -302,7 +315,7 @@ Docker 이미지 크기도 300메가에서 20메가로 줄었고요.
 
 ---
 
-## Slide 15 — Code: 안전한 이메일 발송과 OAuth2 토큰 관리
+## Slide 16 — Code: 안전한 이메일 발송과 OAuth2 토큰 관리
 
 email-service의 보안과 토큰 효율성 코드입니다.
 
@@ -315,20 +328,7 @@ email-service의 보안과 토큰 효율성 코드입니다.
 
 ---
 
-## Slide 16 — Team: 팀 구성 및 역할
-
-OnMeet을 만든 4명의 팀원 소개입니다.
-
-저 최승은은 팀장이자 Full-Stack으로, 프로젝트 총괄과 Video Service 개발, 프론트엔드 전반을 담당했습니다.
-박영진님은 Backend Lead로, MSA 전체 설계와 Auth, Gateway, Notification 서비스 개발, CI/CD 파이프라인 구축, Go 전환 최적화를 리드했습니다.
-조예성님은 Backend로, Notification Service 개발과 Flyway 마이그레이션, 인프라 안정화를 담당했습니다.
-양진영님은 AI Backend로, AI Service 전담으로 STT 음성 인식과 LLM 회의록 생성, AI 파이프라인 전체 구축을 담당했습니다.
-
-4명의 개발자가 7개 마이크로서비스를 5개 언어로 만들었습니다. 지금부터는 각자가 어떤 고민과 시행착오를 거쳤는지, 회고 형식으로 말씀드리겠습니다.
-
----
-
-## Slide 17 — Team: 최승은 회고
+## Slide 17 — 회고: 최승은 회고
 
 앞서 프론트엔드 아키텍처와 기술 선택 결과를 보여드렸는데, 이번에는 그 뒤에 있었던 고민과 시행착오를 말씀드리겠습니다.
 
@@ -376,7 +376,7 @@ auth/api.ts가 471줄까지 불어난 다음에야 분리의 필요성을 체감
 
 ---
 
-## Slide 18 — Team: 박영진 회고
+## Slide 18 — 회고: 박영진 회고
 
 박영진 Backend Lead의 회고입니다. 앞서 아키텍처와 코드로 결과를 보여드렸는데, 여기서는 의사결정 과정과 장애 경험을 중심으로 말씀드립니다.
 
@@ -392,7 +392,7 @@ CI/CD는 510커밋 17회 릴리즈를 무중단으로 배포한 경험이고, �
 
 ---
 
-## Slide 19 — Team: 조예성 회고
+## Slide 19 — 회고: 조예성 회고
 
 조예성 Backend의 회고입니다. 앞서 알림 시스템의 기술 구현을 보여드렸는데, 여기서는 직면한 문제들과 해결 과정을 말씀드립니다.
 
@@ -406,7 +406,7 @@ FCM 쪽에서는 토큰 관리가 예상보다 복잡했습니다. Auth 서비�
 
 ---
 
-## Slide 20 — Team: 양진영 회고
+## Slide 20 — 회고: 양진영 회고
 
 양진영 AI Backend의 회고입니다. 앞서 AI 파이프라인의 구조와 코드를 보여드렸는데, 여기서는 3번의 아키텍처 전면 수정을 거쳐야 했던 고민 과정을 말씀드립니다.
 
