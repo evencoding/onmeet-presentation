@@ -227,19 +227,13 @@ const participants = [
     const video = document.getElementById('demo-video') as HTMLVideoElement;
     if (!btnPlay || !modal || !video) return;
 
-    let playPromise: Promise<void> | undefined;
-
     btnPlay.addEventListener('click', () => {
       modal.classList.remove('hidden');
       modal.classList.add('flex');
-      playPromise = video.play();
-      playPromise.catch(() => {});
     });
 
     function closeModal() {
-      if (playPromise) {
-        playPromise.then(() => video.pause()).catch(() => {});
-      }
+      video.pause();
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     }
