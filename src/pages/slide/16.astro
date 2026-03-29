@@ -1,120 +1,130 @@
 ---
 import SlideLayout from '../../layouts/SlideLayout.astro';
+import { Code } from 'astro:components';
 
-const members = [
-  {
-    name: '최승은',
-    role: '팀장 / Full-Stack',
-    github: '@xeunnie',
-    color: '#9370DB',
-    photo: '/images/developer/choi.jpeg',
-    tasks: [
-      '프로젝트 총괄',
-      'Video Service 개발',
-      '화상회의/채팅/대기실',
-      'FE 전반 개발',
-    ],
-  },
-  {
-    name: '박영진',
-    role: 'Backend Lead',
-    github: '@sprtms16',
-    color: '#61aaff',
-    photo: '/images/developer/park.jpeg',
-    tasks: [
-      'MSA 전체 설계',
-      'Auth/Gateway Service',
-      'CI/CD 파이프라인',
-      'Go 전환 최적화',
-    ],
-  },
-  {
-    name: '조예성',
-    role: 'Backend',
-    github: '@yesung1215',
-    color: '#61ffe6',
-    photo: '/images/developer/jo.jpeg',
-    tasks: [
-      'Notification Service',
-      'Flyway 마이그레이션',
-      '인프라 안정화',
-      '모니터링 설정',
-    ],
-  },
-  {
-    name: '양진영',
-    role: 'AI Backend',
-    github: '@rkddl94',
-    color: '#ffb964',
-    photo: '/images/developer/yang.jpeg',
-    tasks: [
-      'AI Service 개발',
-      'STT 음성 인식',
-      'LLM 회의록 생성',
-      'AI 파이프라인 구축',
-    ],
-  },
-];
+const templateCode = `// EmailService.java — Template Path Traversal Guard
+private static final Set<String> ALLOWED_TEMPLATES =
+    Set.of(
+        "company-invitation",
+        "guest-invitation",
+        "temporary-password"
+    );
+
+public void sendTemplatedEmail(
+    String to,
+    String templateName,
+    Map<String, Object> variables
+) {
+    if (!ALLOWED_TEMPLATES.contains(templateName)) {
+        throw new IllegalArgumentException(
+            "Invalid template: " + templateName
+        );
+    }
+    Context context = new Context();
+    context.setVariables(variables);
+    String body = templateEngine
+        .process(templateName, context);
+    sendEmail(to, resolveSubject(templateName), body);
+}`;
+
+const tokenCode = `// GmailOAuth2TokenService.java
+// Double-checked locking 토큰 캐시 (55분 TTL)
+private volatile String cachedToken;
+private volatile long tokenExpiresAt;
+
+public synchronized String getAccessToken() {
+    if (cachedToken != null
+            && System.currentTimeMillis() < tokenExpiresAt) {
+        return cachedToken; // 캐시 히트
+    }
+    // Google OAuth2 token endpoint 갱신
+    RestTemplate restTemplate = new RestTemplate();
+    Map<String, String> params = Map.of(
+        "client_id", clientId,
+        "client_secret", clientSecret,
+        "refresh_token", refreshToken,
+        "grant_type", "refresh_token"
+    );
+    TokenResponse response = restTemplate.postForObject(
+        GOOGLE_TOKEN_URL, params, TokenResponse.class);
+    cachedToken = response.accessToken();
+    // 55분 TTL (실제 만료 60분보다 짧게 설정)
+    tokenExpiresAt = System.currentTimeMillis()
+        + 55 * 60 * 1000L;
+    return cachedToken;
+}`;
 ---
 
-<SlideLayout title="Developers" slideNumber={16}>
-  <div class="w-full max-w-5xl mx-auto px-6 flex flex-col items-center gap-8">
+<SlideLayout title="email-service Code" slideNumber={16}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h1 class="font-['Manrope',sans-serif] font-extrabold text-4xl text-glow" style="color:#cc97ff;">
-        팀 구성 및 역할
+      <h1 class="font-['Manrope',sans-serif] font-bold text-3xl text-glow-sm" style="color:#cc97ff;">
+        안전한 이메일 발송 + OAuth2 토큰 효율적 관리
       </h1>
-      <h2 class="text-base mt-2 font-medium text-[#f0dfff]/60">
-        Onmeet을 만든 사람들
-      </h2>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">email-service · Java · Spring Boot · Thymeleaf · Gmail SMTP OAuth2</h2>
     </div>
 
-    <!-- Team grid -->
-    <div class="grid grid-cols-4 gap-5 w-full opacity-init anim-fade-up d-200">
-      {members.map((m, i) => (
-        <div
-          class={`glass-card-bright p-6 flex flex-col items-center gap-4 text-center opacity-init anim-fade-up d-${200 + i * 100} hover:scale-105 transition-transform`}
-          style={`border-top:3px solid ${m.color};`}
-        >
-          <!-- Photo -->
-          <div
-            class="w-20 h-20 rounded-full overflow-hidden"
-            style={`border:3px solid ${m.color};`}
-          >
-            <img src={m.photo} alt={m.name} class="w-full h-full object-cover" />
-          </div>
+    <div class="grid grid-cols-2 gap-4 opacity-init anim-scale d-200">
 
-          <!-- Name & role -->
-          <div>
-            <div class="font-['Manrope',sans-serif] font-bold text-xl text-[#f0dfff]">
-              {m.name}
-            </div>
-            <div class="text-sm font-semibold mt-1" style={`color:${m.color};`}>{m.role}</div>
-            <div class="text-xs text-[#f0dfff]/40 mt-0.5">{m.github}</div>
-          </div>
-
-          <!-- Divider -->
-          <div class="w-full h-px" style={`background:${m.color}30;`}></div>
-
-          <!-- Tasks -->
-          <div class="text-left w-full flex flex-col gap-1.5">
-            {m.tasks.map((task) => (
-              <div class="text-sm text-[#f0dfff]/70">{task}</div>
-            ))}
+      <!-- Template Guard -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">EmailService.java</span>
+          <span class="badge badge-pink">Path Traversal Guard</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:270px;">
+          <Code code={templateCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2.5">
+          <div class="text-sm font-semibold text-[#ff95a0]">Template 보안</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            ALLOWED_TEMPLATES Set으로 허용된 템플릿만 렌더링.
+            임의 파일 경로 접근(path traversal) 완전 차단.
+            Thymeleaf Context로 변수 안전 바인딩.
           </div>
         </div>
-      ))}
+      </div>
+
+      <!-- OAuth2 Token Cache -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">GmailOAuth2TokenService</span>
+          <span class="badge badge-blue">Double-checked</span>
+        </div>
+        <div class="code-block code-scroll" style="max-height:270px;">
+          <Code code={tokenCode} lang="java" theme="one-dark-pro" />
+        </div>
+        <div class="glass-card p-2.5">
+          <div class="text-sm font-semibold text-[#61aaff]">토큰 캐시 전략</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            volatile + synchronized로 double-checked locking 구현.
+            실제 만료(60분) 전 55분에 선제 갱신으로 레이스 컨디션 방지.
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Team note -->
-    <div class="glass-card px-6 py-3 text-center opacity-init anim-fade-up d-700">
-      <p class="text-sm text-[#f0dfff]/60">
-        <span style="color:#cc97ff;" class="font-semibold">4</span> developers ·
-        <span style="color:#e197fc;" class="font-semibold">7</span> microservices ·
-        <span style="color:#61aaff;" class="font-semibold">5</span> languages ·
-        Built with passion
-      </p>
+    <!-- Email templates + highlights -->
+    <div class="grid grid-cols-2 gap-3 opacity-init anim-fade-up d-400">
+      <div class="glass-card p-2.5">
+        <div class="text-sm font-semibold mb-2" style="color:#cc97ff;">📧 Email Templates (Thymeleaf)</div>
+        <div class="flex flex-wrap gap-1.5">
+          {['company-invitation', 'guest-invitation', 'temporary-password'].map((t) => (
+            <span class="badge badge-pink">{t}</span>
+          ))}
+        </div>
+      </div>
+      <div class="glass-card p-2.5">
+        <div class="text-sm font-semibold mb-2" style="color:#cc97ff;">🔑 Key Security Points</div>
+        <div class="flex flex-wrap gap-1.5">
+          {['ALLOWED_TEMPLATES whitelist', 'volatile token cache', 'synchronized refresh', '55min TTL (not 60min)', 'OAuth2 refresh_token'].map((t) => (
+            <span class="badge badge-blue text-xs">{t}</span>
+          ))}
+        </div>
+      </div>
     </div>
 
   </div>

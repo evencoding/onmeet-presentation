@@ -11,37 +11,37 @@ const { title, slideNumber, totalSlides = 21 } = Astro.props;
 
 const navLinks = [
   { label: 'Home',         href: '/slide/1',  match: [1] },
-  { label: 'Architecture', href: '/slide/2',  match: [2] },
-  { label: 'Features',     href: '/slide/3',  match: [3] },
-  { label: 'AI Pipeline',  href: '/slide/4',  match: [4] },
-  { label: 'Tech Stack',   href: '/slide/5',  match: [5] },
-  { label: 'Security',     href: '/slide/6',  match: [6] },
-  { label: 'Frontend',     href: '/slide/7',  match: [7] },
-  { label: 'Infra',        href: '/slide/8',  match: [8] },
-  { label: 'Code',         href: '/slide/9',  match: [9,10,11,12,13,14,15] },
-  { label: 'Team',         href: '/slide/16', match: [16,17,18,19,20] },
+  { label: 'Team',         href: '/slide/2',  match: [2] },
+  { label: 'Architecture', href: '/slide/3',  match: [3] },
+  { label: 'Features',     href: '/slide/4',  match: [4] },
+  { label: 'AI Pipeline',  href: '/slide/5',  match: [5] },
+  { label: 'Tech Stack',   href: '/slide/6',  match: [6] },
+  { label: 'Security',     href: '/slide/7',  match: [7] },
+  { label: 'Frontend',     href: '/slide/8',  match: [8] },
+  { label: 'Infra',        href: '/slide/9',  match: [9] },
+  { label: 'Code',         href: '/slide/10', match: [10,11,12,13,14,15,16] },
+  { label: '회고',          href: '/slide/17', match: [17,18,19,20] },
   { label: 'Closing',      href: '/slide/21', match: [21] },
 ];
 
 const isActive = (match: number[]) => match.includes(slideNumber);
 
-const isCodeSlide = slideNumber >= 9 && slideNumber <= 15;
-const isTeamSlide = slideNumber >= 16 && slideNumber <= 20;
-const teamSubNav = [
-  { label: '소개',    href: '/slide/16', num: 16 },
+const isCodeSlide = slideNumber >= 10 && slideNumber <= 16;
+const isRetroSlide = slideNumber >= 17 && slideNumber <= 20;
+const retroSubNav = [
   { label: '최승은',  href: '/slide/17', num: 17 },
   { label: '박영진',  href: '/slide/18', num: 18 },
   { label: '조예성',  href: '/slide/19', num: 19 },
   { label: '양진영',  href: '/slide/20', num: 20 },
 ];
 const codeSubNav = [
-  { label: 'auth',         href: '/slide/9',  num: 9 },
-  { label: 'gateway',      href: '/slide/10', num: 10 },
-  { label: 'video',        href: '/slide/11', num: 11 },
-  { label: 'ai',           href: '/slide/12', num: 12 },
-  { label: 'notification', href: '/slide/13', num: 13 },
-  { label: 'file',         href: '/slide/14', num: 14 },
-  { label: 'email',        href: '/slide/15', num: 15 },
+  { label: 'auth',         href: '/slide/10', num: 10 },
+  { label: 'gateway',      href: '/slide/11', num: 11 },
+  { label: 'video',        href: '/slide/12', num: 12 },
+  { label: 'ai',           href: '/slide/13', num: 13 },
+  { label: 'notification', href: '/slide/14', num: 14 },
+  { label: 'file',         href: '/slide/15', num: 15 },
+  { label: 'email',        href: '/slide/16', num: 16 },
 ];
 ---
 
@@ -113,7 +113,7 @@ const codeSubNav = [
           <div class="flex flex-col gap-1">
             {navLinks.map((link) => {
               const isCode = link.label === 'Code';
-              const isTeam = link.label === 'Team';
+              const isRetro = link.label === '회고';
               return (
                 <>
                   <a
@@ -125,8 +125,8 @@ const codeSubNav = [
                     {isCode && isCodeSlide && (
                       <span class="text-xs text-[#f0dfff]/40 ml-2">({codeSubNav.find(s => s.num === slideNumber)?.label})</span>
                     )}
-                    {isTeam && isTeamSlide && (
-                      <span class="text-xs text-[#f0dfff]/40 ml-2">({teamSubNav.find(s => s.num === slideNumber)?.label})</span>
+                    {isRetro && isRetroSlide && (
+                      <span class="text-xs text-[#f0dfff]/40 ml-2">({retroSubNav.find(s => s.num === slideNumber)?.label})</span>
                     )}
                   </a>
                   {isCode && (
@@ -146,9 +146,9 @@ const codeSubNav = [
                       ))}
                     </div>
                   )}
-                  {isTeam && (
+                  {isRetro && (
                     <div class="flex flex-col gap-0.5 pl-6 mb-1">
-                      {teamSubNav.map((sub) => (
+                      {retroSubNav.map((sub) => (
                         <a
                           href={sub.href}
                           class={`mobile-menu-link text-sm px-3 py-2 rounded-md transition-colors no-underline ${
@@ -196,9 +196,9 @@ const codeSubNav = [
     )}
 
     <!-- Team sub-nav (desktop only) -->
-    {isTeamSlide && (
+    {isRetroSlide && (
       <div class="fixed top-14 left-0 right-0 z-40 h-9 flex items-center justify-center gap-1 px-8 code-subnav" style="background:rgba(23,2,48,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(83,62,109,0.2);">
-        {teamSubNav.map((item) => (
+        {retroSubNav.map((item) => (
           <a
             href={item.href}
             class={`text-xs px-2.5 py-1 rounded-full transition-all no-underline font-medium ${
@@ -215,7 +215,7 @@ const codeSubNav = [
     )}
 
     <!-- Slide content -->
-    <main class={`relative z-10 h-screen ${isCodeSlide || isTeamSlide ? 'pt-[5.75rem]' : 'pt-14'} pb-12 flex items-center justify-center overflow-hidden`}>
+    <main class={`relative z-10 h-screen ${isCodeSlide || isRetroSlide ? 'pt-[5.75rem]' : 'pt-14'} pb-12 flex items-center justify-center overflow-hidden`}>
       <slot />
     </main>
 

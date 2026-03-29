@@ -2,144 +2,150 @@
 import SlideLayout from '../../layouts/SlideLayout.astro';
 import { Code } from 'astro:components';
 
-const sseCode = `// NotificationService.java — Multi-tab SSE
-Map<Long, Map<String, SseEmitter>> emitters =
-    new ConcurrentHashMap<>();
+const vadCode = `// SileroVadClient.java — ONNX VAD 추론
+private float runInference(float[] window,
+                           float[] state, long[] sr) {
+    OnnxTensor inputTensor = OnnxTensor.createTensor(
+        env, FloatBuffer.wrap(window), inputShape);
+    OnnxTensor stateTensor = OnnxTensor.createTensor(
+        env, FloatBuffer.wrap(state), stateShape);
+    Map<String, OnnxTensor> inputs = Map.of(
+        "input", inputTensor,
+        "state", stateTensor,
+        "sr", OnnxTensor.createTensor(env, sr));
+    try (OrtSession.Result result = session.run(inputs)) {
+        float[][] output =
+            (float[][]) result.get(0).getValue();
+        return output[0][0]; // speech probability
+    }
+}`;
 
-public SseEmitter subscribe(Long userId) {
-    SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-    String emitterId = userId + "_" + UUID.randomUUID();
-    emitters
-        .computeIfAbsent(userId, k -> new ConcurrentHashMap<>())
-        .put(emitterId, emitter);
-    emitter.onCompletion(() -> removeEmitter(userId, emitterId));
-    emitter.onTimeout(() -> removeEmitter(userId, emitterId));
-    emitter.send(
-        SseEmitter.event().name("connect").data("Connected!")
+const sttCode = `// SttWorkerService.java — VAD → STT 파이프라인
+for (int i = 0; i < segments.size(); i++) {
+    SpeechSegment seg = segments.get(i);
+    // 100ms 미만 노이즈 스킵
+    if (seg.endMs() - seg.startMs() < 100) continue;
+    byte[] segmentAudio = audioDecoder
+        .extractAndEncode(pcmSamples, seg);
+    String text = sttClient.transcribe(
+        segmentAudio, "seg-" + i + ".wav", "audio/wav");
+    publishVoiceSegment(
+        event,
+        chunkStartMs + seg.startMs(),
+        chunkStartMs + seg.endMs(),
+        sequenceNo, text
     );
-    return emitter;
 }`;
 
-const fcmCode = `// FCM 알림 발송 (모바일 지원)
-public void sendFcmNotification(
-    Long userId, NotificationMessage msg
-) {
-    List<String> tokens = fcmTokenRepo.findByUserId(userId);
-    if (tokens.isEmpty()) return;
-    MulticastMessage message = MulticastMessage.builder()
-        .addAllTokens(tokens)
-        .setNotification(Notification.builder()
-            .setTitle(msg.title())
-            .setBody(msg.body())
-            .build())
-        .putAllData(msg.data())
-        .build();
-    FirebaseMessaging.getInstance()
-        .sendEachForMulticast(message);
-}`;
-
-const toggleCode = `// 알림 설정 토글 — 발송 전 체크
-public void sendNotification(
-    Long userId, NotificationType type,
-    NotificationMessage msg
-) {
-    NotificationSetting setting =
-        settingRepo.findByUserId(userId);
-
-    // 해당 카테고리 토글이 OFF면 발송 차단
-    if (!setting.isEnabled(type)) return;
-
-    // SSE 발송
-    sendSseNotification(userId, msg);
-    // FCM 발송
-    sendFcmNotification(userId, msg);
-}
-
-// 유저별 알림 카테고리
-enum NotificationType {
-    MEETING,      // 회의 알림
-    TEAM,         // 팀 알림
-    MEETING_NOTE  // 회의록 알림
-}`;
+const claudeCode = `// ClaudeSummarizerClient.java — 구조화 JSON 출력
+String systemPrompt = """
+    You MUST output ONLY a valid JSON object:
+    {
+      "description": "전체 회의 요약",
+      "keywords": ["키워드1", "키워드2"],
+      "decisions": ["결정사항1"],
+      "actionItems": [{
+        "assignee": "담당자",
+        "task": "작업내용",
+        "dueDate": "기한"
+      }]
+    }""";
+// JSON 스키마 검증 후 저장`;
 ---
 
-<SlideLayout title="notification-service Code" slideNumber={13}>
+<SlideLayout title="ai-service Code" slideNumber={13}>
   <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
       <h1 class="font-['Manrope',sans-serif] font-bold text-3xl text-glow-sm" style="color:#cc97ff;">
-        웹 + 모바일 실시간 알림 이중 채널
+        음성 → 텍스트 → 회의 요약 AI 파이프라인
       </h1>
-      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">notification-service · Java · Spring Boot · SSE · Firebase FCM · Kafka</h2>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">ai-service · Java · Spring Boot · Silero ONNX · OpenAI STT · Claude</h2>
     </div>
 
     <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
 
-      <!-- 1. Multi-tab SSE -->
+      <!-- VAD -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SSE Subscribe</span>
-          <span class="badge badge-purple">Multi-tab</span>
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SileroVadClient</span>
+          <span class="badge badge-purple">ONNX</span>
         </div>
         <div class="code-block code-scroll" style="max-height:220px;">
-          <Code code={sseCode} lang="java" theme="one-dark-pro" />
+          <Code code={vadCode} lang="java" theme="one-dark-pro" />
         </div>
         <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#cc97ff]">멀티탭 SSE 실시간 알림</div>
+          <div class="text-sm font-semibold text-[#9333EA]">Silero VAD v4 — 과금 방어망</div>
           <div class="text-xs text-[#f0dfff]/55 mt-0.5">
-            userId → Map&lt;emitterId, SseEmitter&gt; 이중 Map 구조.
-            여러 탭/디바이스 동시 연결 처리.
-            30초 heartbeat로 dead emitter 자동 정리.
+            로컬 ONNX Runtime으로 무음 필터링 (비용 0원).
+            PCM 정규화로 작은 속삭임까지 누락 없이 분석.
           </div>
         </div>
       </div>
 
-      <!-- 2. FCM (가운데) -->
+      <!-- STT Worker -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">FCM Dispatch</span>
-          <span class="badge badge-orange">Firebase</span>
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SttWorkerService</span>
+          <span class="badge badge-blue">OpenAI STT</span>
         </div>
         <div class="code-block code-scroll" style="max-height:220px;">
-          <Code code={fcmCode} lang="java" theme="one-dark-pro" />
+          <Code code={sttCode} lang="java" theme="one-dark-pro" />
         </div>
         <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#ffb964]">FCM 모바일 푸시</div>
+          <div class="text-sm font-semibold text-[#61aaff]">gpt-4o-mini-transcribe</div>
           <div class="text-xs text-[#f0dfff]/55 mt-0.5">
-            Auth 서비스 최신 토큰 + 로컬 DB 토큰을 Set으로 합쳐 중복 없이 발송.
-            실패 시 최대 3회 재시도, 무효 토큰 자동 삭제.
+            whisper-1 대비 압도적 한국어 인식률.
+            화자/타임스탬프 정확성 + 비용 절감 동시 달성.
           </div>
         </div>
       </div>
 
-      <!-- 3. 알림 설정 토글 -->
+      <!-- Claude Summarizer -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">Notification Toggle</span>
-          <span class="badge badge-green">Settings</span>
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">ClaudeSummarizer</span>
+          <span class="badge badge-cyan">LLM</span>
         </div>
         <div class="code-block code-scroll" style="max-height:220px;">
-          <Code code={toggleCode} lang="java" theme="one-dark-pro" />
+          <Code code={claudeCode} lang="java" theme="one-dark-pro" />
         </div>
         <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#61ff96]">유저별 알림 설정 토글</div>
+          <div class="text-sm font-semibold text-[#61ffe6]">Claude 3.5 Sonnet — Strict JSON</div>
           <div class="text-xs text-[#f0dfff]/55 mt-0.5">
-            회의 / 팀 / 회의록 3가지 카테고리 개별 ON/OFF.
-            토글 OFF 시 발송 자체를 차단하는 구조.
+            프롬프트 엔지니어링으로 순수 JSON 강제 출력.
+            DB 스키마 1:1 매핑 후 역직렬화 검증.
           </div>
         </div>
       </div>
 
     </div>
 
-    <!-- Kafka consumer + notification types -->
-    <div class="glass-card p-2.5 opacity-init anim-fade-up d-400">
-      <div class="flex items-center gap-4 flex-wrap">
-        <div class="text-sm font-semibold" style="color:#cc97ff;">📨 Kafka Consumer Topics</div>
-        {['meeting-start', 'meeting-end', 'ai-summary-ready', 'invitation', 'temporary-password'].map((t) => (
-          <span class="badge badge-orange">{t}</span>
-        ))}
+    <!-- Pipeline summary -->
+    <div class="stat-row-desktop w-full opacity-init anim-fade-up d-400">
+      <div class="overflow-x-auto no-swipe" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+        <div class="stat-row-inner flex items-center gap-2 min-w-max">
+          {[
+            { icon: '📥', label: 'Kafka Consumer', color: '#ffb964' },
+            { icon: '🔊', label: 'S3 오디오 다운로드', color: '#61aaff' },
+            { icon: '🎚️', label: 'Silero VAD 필터링', color: '#cc97ff' },
+            { icon: '📝', label: 'OpenAI STT 변환', color: '#9333EA' },
+            { icon: '🤖', label: 'Claude 요약 생성', color: '#e197fc' },
+            { icon: '💾', label: 'file-service 저장 + SSE', color: '#61ff96' },
+          ].map((s, i) => (
+            <div class="flex items-center gap-2 shrink-0 flex-1">
+              <div
+                class="glass-card px-3 py-2 flex items-center gap-1.5 whitespace-nowrap flex-1"
+                style={`border-color:${s.color}40;`}
+              >
+                <span class="text-xs">{s.icon}</span>
+                <span class="text-xs font-medium" style={`color:${s.color};`}>{s.label}</span>
+              </div>
+              {i < 5 && <span class="text-[#533e6d] text-xs">→</span>}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
 

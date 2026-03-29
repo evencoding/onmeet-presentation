@@ -2,147 +2,151 @@
 import SlideLayout from '../../layouts/SlideLayout.astro';
 import { Code } from 'astro:components';
 
-const vadCode = `// SileroVadClient.java — ONNX VAD 추론
-private float runInference(float[] window,
-                           float[] state, long[] sr) {
-    OnnxTensor inputTensor = OnnxTensor.createTensor(
-        env, FloatBuffer.wrap(window), inputShape);
-    OnnxTensor stateTensor = OnnxTensor.createTensor(
-        env, FloatBuffer.wrap(state), stateShape);
-    Map<String, OnnxTensor> inputs = Map.of(
-        "input", inputTensor,
-        "state", stateTensor,
-        "sr", OnnxTensor.createTensor(env, sr));
-    try (OrtSession.Result result = session.run(inputs)) {
-        float[][] output =
-            (float[][]) result.get(0).getValue();
-        return output[0][0]; // speech probability
+const webhookCode = `// LiveKitWebhookController.java
+// Track Published → 참여자별 Egress 시작
+case TRACK_PUBLISHED -> {
+    String participantIdentity =
+        event.getParticipant().getIdentity();
+    TrackInfo track = event.getTrack();
+    if (track.getSource() == TrackSource.MICROPHONE) {
+        recordingService.startParticipantTrackEgress(
+            roomName,
+            participantIdentity,
+            track.getSid()
+        );
     }
-}`;
+}
 
-const sttCode = `// SttWorkerService.java — VAD → STT 파이프라인
-for (int i = 0; i < segments.size(); i++) {
-    SpeechSegment seg = segments.get(i);
-    // 100ms 미만 노이즈 스킵
-    if (seg.endMs() - seg.startMs() < 100) continue;
-    byte[] segmentAudio = audioDecoder
-        .extractAndEncode(pcmSamples, seg);
-    String text = sttClient.transcribe(
-        segmentAudio, "seg-" + i + ".wav", "audio/wav");
-    publishVoiceSegment(
-        event,
-        chunkStartMs + seg.startMs(),
-        chunkStartMs + seg.endMs(),
-        sequenceNo, text
+case PARTICIPANT_LEFT -> {
+    recordingService.stopParticipantEgress(
+        roomName, participantIdentity
+    );
+    kafkaProducer.publishChunkReady(
+        roomName, participantIdentity
     );
 }`;
 
-const claudeCode = `// ClaudeSummarizerClient.java — 구조화 JSON 출력
-String systemPrompt = """
-    You MUST output ONLY a valid JSON object:
-    {
-      "description": "전체 회의 요약",
-      "keywords": ["키워드1", "키워드2"],
-      "decisions": ["결정사항1"],
-      "actionItems": [{
-        "assignee": "담당자",
-        "task": "작업내용",
-        "dueDate": "기한"
-      }]
-    }""";
-// JSON 스키마 검증 후 저장`;
+const egressCode = `// RoomRecordingService.java
+// LiveKit TrackEgress S3 저장
+public void startParticipantTrackEgress(
+    String roomName, String identity, String trackSid
+) {
+    TrackEgressRequest req = TrackEgressRequest.newBuilder()
+        .setRoomName(roomName)
+        .setTrackId(trackSid)
+        .setFile(DirectFileOutput.newBuilder()
+            .setFilepath(buildS3Path(roomName, identity))
+            .build())
+        .build();
+    egressClient.startTrackEgress(req);
+    activeEgress.put(identity, req);
+}`;
+
+const jwtCode = `// LiveKitClientImpl.java
+// HS256 JWT (raw HMAC-SHA256)
+private String generateJwt(Map<String, Object> claims) {
+    String header = base64Url(
+        objectMapper.writeValueAsBytes(
+            Map.of("alg","HS256","typ","JWT")));
+    String payload = base64Url(
+        objectMapper.writeValueAsBytes(claims));
+    String sig = hmacSha256(
+        header + "." + payload, apiSecret);
+    return header + "." + payload + "." + sig;
+}`;
 ---
 
-<SlideLayout title="ai-service Code" slideNumber={12}>
+<SlideLayout title="video-service Code" slideNumber={12}>
   <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
       <h1 class="font-['Manrope',sans-serif] font-bold text-3xl text-glow-sm" style="color:#cc97ff;">
-        음성 → 텍스트 → 회의 요약 AI 파이프라인
+        화상회의 녹화 자동화 파이프라인
       </h1>
-      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">ai-service · Java · Spring Boot · Silero ONNX · OpenAI STT · Claude</h2>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">video-service · Java · Spring Boot · LiveKit SDK · Kafka</h2>
     </div>
 
     <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
 
-      <!-- VAD -->
+      <!-- Webhook handler -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SileroVadClient</span>
-          <span class="badge badge-purple">ONNX</span>
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">WebhookController</span>
+          <span class="badge badge-blue">Webhook</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:220px;">
-          <Code code={vadCode} lang="java" theme="one-dark-pro" />
+        <div class="code-block code-scroll" style="max-height:230px;">
+          <Code code={webhookCode} lang="java" theme="one-dark-pro" />
         </div>
         <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#9333EA]">Silero VAD v4 — 과금 방어망</div>
-          <div class="text-xs text-[#f0dfff]/55 mt-0.5">
-            로컬 ONNX Runtime으로 무음 필터링 (비용 0원).
-            PCM 정규화로 작은 속삭임까지 누락 없이 분석.
+          <div class="text-sm font-semibold text-[#61aaff]">WebRTC 이벤트 처리</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            LiveKit 서버 → Webhook → 참여자별 마이크 트랙 Egress 자동 시작.
+            PARTICIPANT_LEFT 시 Kafka audioChunkReady 발행.
           </div>
         </div>
       </div>
 
-      <!-- STT Worker -->
+      <!-- Egress service -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SttWorkerService</span>
-          <span class="badge badge-blue">OpenAI STT</span>
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">RecordingService</span>
+          <span class="badge badge-blue">Egress</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:220px;">
-          <Code code={sttCode} lang="java" theme="one-dark-pro" />
+        <div class="code-block code-scroll" style="max-height:230px;">
+          <Code code={egressCode} lang="java" theme="one-dark-pro" />
         </div>
         <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#61aaff]">gpt-4o-mini-transcribe</div>
-          <div class="text-xs text-[#f0dfff]/55 mt-0.5">
-            whisper-1 대비 압도적 한국어 인식률.
-            화자/타임스탬프 정확성 + 비용 절감 동시 달성.
+          <div class="text-sm font-semibold text-[#61aaff]">TrackEgress 오케스트레이션</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            참여자 마이크 트랙을 LiveKit Egress API로 S3에 저장.
+            activeEgress Map으로 진행 중인 녹음 관리.
           </div>
         </div>
       </div>
 
-      <!-- Claude Summarizer -->
+      <!-- JWT generation -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">ClaudeSummarizer</span>
-          <span class="badge badge-cyan">LLM</span>
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">LiveKitClient</span>
+          <span class="badge badge-blue">HS256 JWT</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:220px;">
-          <Code code={claudeCode} lang="java" theme="one-dark-pro" />
+        <div class="code-block code-scroll" style="max-height:230px;">
+          <Code code={jwtCode} lang="java" theme="one-dark-pro" />
         </div>
         <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#61ffe6]">Claude 3.5 Sonnet — Strict JSON</div>
-          <div class="text-xs text-[#f0dfff]/55 mt-0.5">
-            프롬프트 엔지니어링으로 순수 JSON 강제 출력.
-            DB 스키마 1:1 매핑 후 역직렬화 검증.
+          <div class="text-sm font-semibold text-[#61aaff]">LiveKit Access Token</div>
+          <div class="text-xs text-[#f0dfff]/55 mt-1">
+            LiveKit API는 HS256 JWT 요구. 외부 라이브러리 없이
+            Raw HMAC-SHA256으로 직접 생성 (의존성 최소화).
           </div>
         </div>
       </div>
 
     </div>
 
-    <!-- Pipeline summary -->
+    <!-- Flow -->
     <div class="stat-row-desktop w-full opacity-init anim-fade-up d-400">
+      <div class="text-sm font-semibold mb-1.5" style="color:#cc97ff;">Recording Flow</div>
       <div class="overflow-x-auto no-swipe" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
         <div class="stat-row-inner flex items-center gap-2 min-w-max">
           {[
-            { icon: '📥', label: 'Kafka Consumer', color: '#ffb964' },
-            { icon: '🔊', label: 'S3 오디오 다운로드', color: '#61aaff' },
-            { icon: '🎚️', label: 'Silero VAD 필터링', color: '#cc97ff' },
-            { icon: '📝', label: 'OpenAI STT 변환', color: '#9333EA' },
-            { icon: '🤖', label: 'Claude 요약 생성', color: '#e197fc' },
-            { icon: '💾', label: 'file-service 저장 + SSE', color: '#61ff96' },
+            { step: '📡 LiveKit Webhook', color: '#61aaff' },
+            { step: '🎙️ TrackPublished', color: '#cc97ff' },
+            { step: '▶️ startTrackEgress()', color: '#9333EA' },
+            { step: '💾 S3 OGG 저장', color: '#e197fc' },
+            { step: '👋 ParticipantLeft', color: '#ff95a0' },
+            { step: '📨 Kafka: audio-chunk-ready', color: '#ffb964' },
+            { step: '🤖 ai-service 소비', color: '#61ff96' },
           ].map((s, i) => (
             <div class="flex items-center gap-2 shrink-0 flex-1">
               <div
-                class="glass-card px-3 py-2 flex items-center gap-1.5 whitespace-nowrap flex-1"
-                style={`border-color:${s.color}40;`}
+                class="glass-card px-3 py-2 text-xs font-medium whitespace-nowrap text-center flex-1"
+                style={`border-color:${s.color}40;color:${s.color};`}
               >
-                <span class="text-xs">{s.icon}</span>
-                <span class="text-xs font-medium" style={`color:${s.color};`}>{s.label}</span>
+                {s.step}
               </div>
-              {i < 5 && <span class="text-[#533e6d] text-xs">→</span>}
+              {i < 6 && <span class="text-[#533e6d] text-xs">→</span>}
             </div>
           ))}
         </div>

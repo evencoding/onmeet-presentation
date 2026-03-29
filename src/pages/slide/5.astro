@@ -1,136 +1,140 @@
 ---
 import SlideLayout from '../../layouts/SlideLayout.astro';
 
-// Simple Icons CDN: https://cdn.simpleicons.org/{slug}/{color}
-const si = (slug: string, color = 'white') => `https://cdn.simpleicons.org/${slug}/${color}`;
-const ji = (slug: string) => `https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/${slug}.svg`;
-
-const columns = [
+const stages = [
   {
-    title: 'Backend',
-    icon: si('spring', '6DB33F'),
-    color: '#9333EA',
-    badgeClass: 'badge-purple',
-    techs: [
-      { logo: si('springboot', '6DB33F'), name: 'Spring Boot 3.3.5' },
-      { logo: si('kotlin', '7F52FF'), name: 'Kotlin (auth/gateway)' },
-      { logo: si('openjdk', 'FFFFFF'), name: 'Java (ai/video/noti)' },
-      { logo: si('go', '00ADD8'), name: 'Go (file-service)' },
-      { logo: si('springsecurity', '6DB33F'), name: 'Spring Security' },
-      { logo: si('spring', '6DB33F'), name: 'Spring WebFlux' },
-      { logo: si('hibernate', '59666C'), name: 'JPA + Flyway' },
-    ],
-  },
-  {
-    title: 'Frontend',
-    icon: si('react', '61DAFB'),
+    num: '01',
+    icon: '🎙️',
+    title: 'Audio Capture',
+    sub: 'LiveKit Egress → S3',
     color: '#61aaff',
-    badgeClass: 'badge-blue',
-    techs: [
-      { logo: si('react', '61DAFB'), name: 'React 18' },
-      { logo: si('typescript', '3178C6'), name: 'TypeScript' },
-      { logo: si('vite', '646CFF'), name: 'Vite 7' },
-      { logo: '', name: 'Zustand v5', emoji: '🐻' },
-      { logo: si('reactquery', 'FF4154'), name: 'TanStack Query v5' },
-      { logo: si('reactrouter', 'CA4245'), name: 'React Router v6' },
-      { logo: si('tailwindcss', '06B6D4'), name: 'Tailwind CSS' },
-      { logo: si('cloudflare', 'F38020'), name: 'Cloudflare Pages' },
-    ],
+    details: ['LiveKit Track Egress', 'OGG/Opus 저장', 'S3 (MinIO) 업로드'],
   },
   {
-    title: 'AI & Media',
-    icon: ji('openai'),
+    num: '02',
+    icon: '📨',
+    title: 'Kafka Event',
+    sub: 'audio-chunk-ready',
+    color: '#ffb964',
+    details: ['audio-chunk-ready 토픽', '참여자·청크 메타 포함', '비동기 파이프라인'],
+  },
+  {
+    num: '03',
+    icon: '🔊',
+    title: 'VAD',
+    sub: 'Silero v4 ONNX',
+    color: '#cc97ff',
+    details: ['Silero VAD v4 ONNX', '무음 구간 필터링', '30ms 슬라이딩 윈도우'],
+  },
+  {
+    num: '04',
+    icon: '📝',
+    title: 'STT',
+    sub: 'OpenAI gpt-4o-mini-transcribe',
     color: '#e197fc',
-    badgeClass: 'badge-purple',
-    techs: [
-      { logo: ji('openai'), name: 'OpenAI STT' },
-      { logo: si('anthropic', 'D4A27F'), name: 'Claude API' },
-      { logo: si('onnx', '005CED'), name: 'Silero VAD ONNX' },
-      { logo: si('livekit', '000000'), name: 'LiveKit SFU' },
-      { logo: si('webrtc', '333333'), name: 'WebRTC' },
-      { logo: si('gmail', 'EA4335'), name: 'Gmail OAuth2' },
-      { logo: si('thymeleaf', '005F0F'), name: 'Thymeleaf' },
-    ],
+    details: ['OpenAI STT API 호출', '세그먼트별 텍스트 변환', 'voice-segment 토픽'],
   },
   {
-    title: 'Infrastructure',
-    icon: si('docker', '2496ED'),
-    color: '#61ffe6',
-    badgeClass: 'badge-cyan',
-    techs: [
-      { logo: si('googlecloud', '4285F4'), name: 'GCP e2-standard-4' },
-      { logo: si('docker', '2496ED'), name: 'Docker + Compose' },
-      { logo: si('githubactions', '2088FF'), name: 'GitHub Actions' },
-      { logo: si('apachekafka', '231F20'), name: 'Kafka 7.5.0' },
-      { logo: si('redis', 'FF4438'), name: 'Redis 7' },
-      { logo: si('mysql', '4479A1'), name: 'MySQL 9.0' },
-      { logo: si('postgresql', '4169E1'), name: 'PostgreSQL 16' },
-      { logo: si('minio', 'C72E49'), name: 'MinIO (S3)' },
-      { logo: si('nginx', '009639'), name: 'Nginx' },
-      { logo: si('cloudflare', 'F38020'), name: 'Cloudflare DNS' },
-    ],
+    num: '05',
+    icon: '🤖',
+    title: 'AI Summary',
+    sub: 'Claude API',
+    color: '#9333EA',
+    details: ['Claude API 호출', 'JSON 구조화 출력', '키워드·결정·액션 추출'],
+  },
+  {
+    num: '06',
+    icon: '💾',
+    title: 'Output',
+    sub: 'file-service + SSE',
+    color: '#61ff96',
+    details: ['file-service 저장', 'SSE 실시간 알림', 'FCM 푸시 발송'],
   },
 ];
 ---
 
-<SlideLayout title="Tech Stack" slideNumber={5}>
+<SlideLayout title="AI Pipeline" slideNumber={5}>
   <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Tech Stack</h1>
-      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">사용 기술 전체 목록</h2>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">AI Pipeline</h1>
+      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">Audio → VAD → STT → LLM → 실시간 회의록</h2>
     </div>
 
-    <!-- 4 columns -->
-    <div class="grid grid-cols-4 gap-4">
-      {columns.map((col, i) => (
-        <div
-          class={`glass-card p-4 flex flex-col gap-3 opacity-init anim-fade-up d-${200 + i * 100}`}
-          style={`border-color:${col.color}30;`}
-        >
-          <div class="flex items-center gap-2">
-            <img src={col.icon} alt="" class="w-5 h-5 tech-icon" />
-            <span class="font-['Manrope',sans-serif] font-bold text-base" style={`color:${col.color};`}>{col.title}</span>
-          </div>
-          <div class="h-px" style={`background:linear-gradient(90deg,${col.color}50,transparent);`}></div>
-          <div class="flex flex-wrap gap-1.5">
-            {col.techs.map((t) => (
-              <span class={`badge ${col.badgeClass} flex items-center gap-1.5`}>
-                {t.logo ? (
-                  <img src={t.logo} alt="" class="w-3.5 h-3.5 tech-icon" />
-                ) : (
-                  <span class="text-xs">{t.emoji}</span>
-                )}
-                {t.name}
-              </span>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-
-    <!-- Language summary -->
-    <div class="flex flex-wrap items-center justify-center gap-3 opacity-init anim-fade-up d-600">
-      <div class="flex flex-wrap items-center justify-center gap-3">
-        {[
-          { lang: 'Kotlin', pct: 30, color: '#9333EA', logo: si('kotlin', '7F52FF') },
-          { lang: 'Java', pct: 40, color: '#61aaff', logo: si('openjdk', 'FFFFFF') },
-          { lang: 'Go', pct: 15, color: '#61ffe6', logo: si('go', '00ADD8') },
-          { lang: 'TypeScript', pct: 15, color: '#ffb964', logo: si('typescript', '3178C6') },
-        ].map((l) => (
-          <div class="flex items-center gap-1.5">
-            <img src={l.logo} alt="" class="w-3.5 h-3.5 tech-icon" />
-            <span class="text-sm font-medium text-[#f0dfff]/80">{l.lang}</span>
-            <span class="text-sm" style={`color:${l.color};`}>{l.pct}%</span>
-          </div>
+    <!-- Pipeline stages -->
+    <div class="overflow-x-auto no-swipe opacity-init anim-scale d-200 w-full" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+      <div class="flex items-stretch gap-1.5 min-w-max w-full">
+        {stages.map((s, i) => (
+          <>
+            <div
+              class="glass-card p-3 flex flex-col gap-1.5 shrink-0 flex-1 overflow-hidden"
+              style={`border-color:${s.color}35;min-width:140px;`}
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold font-mono" style={`color:${s.color};`}>{s.num}</span>
+                <span class="text-base">{s.icon}</span>
+              </div>
+              <div class="font-['Manrope',sans-serif] font-bold text-sm text-[#f0dfff]">{s.title}</div>
+              <div class="text-xs" style={`color:${s.color};`}>{s.sub}</div>
+              <div class="mt-1 flex flex-col gap-0.5">
+                {s.details.map((d) => (
+                  <div class="text-xs text-[#f0dfff]/55 flex items-start gap-1">
+                    <span style={`color:${s.color};opacity:0.7;`}>·</span>
+                    {d}
+                  </div>
+                ))}
+              </div>
+            </div>
+            {i < stages.length - 1 && (
+              <div class="flex items-center justify-center flex-shrink-0 w-4">
+                <span class="text-[#cc97ff]/50 text-xs">→</span>
+              </div>
+            )}
+          </>
         ))}
       </div>
-      <div class="h-3 flex rounded-full overflow-hidden w-48">
-        <div style="width:30%;background:#9333EA;"></div>
-        <div style="width:40%;background:#61aaff;"></div>
-        <div style="width:15%;background:#61ffe6;"></div>
-        <div style="width:15%;background:#ffb964;"></div>
+    </div>
+
+    <!-- Kafka topics bar -->
+    <div class="glass-card p-3 opacity-init anim-fade-up d-400 w-full">
+      <div class="text-sm font-semibold mb-2" style="color:#ffb964;">📨 Kafka Topics Flow</div>
+      <div class="overflow-x-auto no-swipe" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+        <div class="flex items-center gap-2 min-w-max">
+          {[
+            { topic: 'audio-chunk-ready', color: '#ffb964', arrow: true },
+            { topic: 'voice-segment', color: '#cc97ff', arrow: true },
+            { topic: 'meeting-summary-ready', color: '#61ff96', arrow: true },
+            { topic: 'notification-send', color: '#61aaff', arrow: false },
+          ].map((t) => (
+            <div class="flex items-center gap-1.5 shrink-0">
+              <div
+                class="px-2.5 py-1 rounded text-xs font-mono font-medium whitespace-nowrap"
+                style={`background:${t.color}15;border:1px solid ${t.color}40;color:${t.color};`}
+              >
+                {t.topic}
+              </div>
+              {t.arrow && <span class="text-[#533e6d] text-xs">→</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom stats -->
+    <div class="stat-row-desktop overflow-x-auto no-swipe opacity-init anim-fade-up d-500 w-full" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+      <div class="stat-row-inner flex items-center gap-3 min-w-max w-full">
+        {[
+          { v: 'Silero VAD', d: 'ONNX v4 무음 필터링' },
+          { v: 'OpenAI STT', d: 'gpt-4o-mini-transcribe' },
+          { v: 'Claude', d: 'JSON 구조화 요약' },
+          { v: '< 3s', d: '평균 응답 지연' },
+        ].map((s) => (
+          <div class="glass-card text-center py-2.5 px-5 shrink-0 flex-1">
+            <div class="text-base font-bold gradient-text whitespace-nowrap">{s.v}</div>
+            <div class="text-xs mt-0.5 text-[#f0dfff]/50 whitespace-nowrap">{s.d}</div>
+          </div>
+        ))}
       </div>
     </div>
 

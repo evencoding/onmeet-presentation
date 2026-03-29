@@ -1,111 +1,98 @@
 ---
 import SlideLayout from '../../layouts/SlideLayout.astro';
 
-const features = [
-  {
-    icon: '🎥',
-    title: '실시간 화상회의',
-    subtitle: 'video-service · Java · LiveKit',
-    color: '#3b82f6',
-    badgeClass: 'badge-blue',
-    items: [
-      'LiveKit WebRTC SFU 기반',
-      'Gallery / Speaker 뷰 전환',
-      '채팅 · 화면 공유',
-      '대기실 (Waiting Room)',
-      'PIP 모드 지원',
-      'Kafka Egress 오디오 레코딩',
-    ],
-  },
-  {
-    icon: '🤖',
-    title: 'AI 회의록 자동 생성',
-    subtitle: 'ai-service · Java · Claude',
-    color: '#9333EA',
-    badgeClass: 'badge-purple',
-    items: [
-      'Silero VAD v4 ONNX 무음 필터링',
-      'OpenAI STT 세그먼트 변환',
-      'Claude API 구조화 요약',
-      '결정사항 · 액션아이템 추출',
-      'BlockNote 리치 텍스트 에디터',
-      'SSE 실시간 완성 알림',
-    ],
-  },
-  {
-    icon: '🔐',
-    title: '기업급 보안 & 알림',
-    subtitle: 'auth/gateway/notification · Kotlin',
-    color: '#ff95a0',
-    badgeClass: 'badge-pink',
-    items: [
-      'RSA-2048 JWT / JWKS 엔드포인트',
-      'AES-256-GCM 키 암호화',
-      'PBKDF2 600K 반복 KDF',
-      'SSE + FCM 멀티탭 지원',
-      'Kafka 이벤트 기반 알림 발송',
-      'HttpOnly Cookie · X-Gateway-Secret',
-    ],
-  },
+const services = [
+  { name: 'auth-service',         lang: 'Kotlin', port: ':8081', db: 'MySQL + Redis',   icon: '🔐', color: '#9333EA', badge: 'badge-purple' },
+  { name: 'video-service',        lang: 'Java',   port: ':8083', db: 'MySQL + LiveKit',  icon: '🎥', color: '#3b82f6', badge: 'badge-blue' },
+  { name: 'ai-service',           lang: 'Java',   port: ':8082', db: 'MySQL',            icon: '🤖', color: '#3b82f6', badge: 'badge-blue' },
+  { name: 'notification-service', lang: 'Java',   port: ':8085', db: 'MySQL',            icon: '🔔', color: '#3b82f6', badge: 'badge-blue' },
+  { name: 'file-service',         lang: 'Go',     port: ':8086', db: 'PostgreSQL+MinIO', icon: '📁', color: '#06b6d4', badge: 'badge-cyan' },
+  { name: 'email-service',        lang: 'Java',   port: ':8087', db: 'Gmail OAuth2',          icon: '✉️', color: '#3b82f6', badge: 'badge-blue' },
 ];
 ---
 
-<SlideLayout title="Key Features" slideNumber={3}>
-  <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
+<SlideLayout title="System Architecture" slideNumber={3}>
+  <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Key Features</h1>
-      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">세 가지 핵심 기능</h2>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">System Architecture</h1>
+      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">MSA 기반 마이크로서비스 아키텍처</h2>
     </div>
 
-    <!-- Three feature cards -->
-    <div class="grid grid-cols-3 gap-4">
-      {features.map((f, i) => (
-        <div
-          class={`glass-card p-5 flex flex-col gap-3 opacity-init anim-fade-up d-${200 + i * 150}`}
-          style={`border-color:${f.color}30;`}
-        >
-          <div class="flex items-center gap-2">
-            <span class="text-2xl">{f.icon}</span>
-            <div>
-              <div class="font-['Manrope',sans-serif] font-bold text-base" style="color:#f0dfff;">{f.title}</div>
-              <div class="text-xs" style="color:#f0dfff;opacity:0.5;">{f.subtitle}</div>
+    <!-- Top flow: Client → Nginx → Gateway -->
+    <div class="overflow-x-auto no-swipe opacity-init anim-fade-up d-100" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+      <div class="flex items-center gap-2 min-w-max px-2 py-1 mx-auto w-fit">
+        {[
+          { label: 'Client', sub: 'React + Vite', color: '#cc97ff' },
+          null,
+          { label: 'Nginx', sub: 'Reverse Proxy', color: '#e197fc' },
+          null,
+          { label: 'Gateway', sub: 'Kotlin · WebFlux · :8080', color: '#9333EA' },
+        ].map((item) =>
+          item === null ? (
+            <div class="pipeline-arrow">→</div>
+          ) : (
+            <div class="glass-card px-3 py-1.5 text-center shrink-0" style={`border-color:${item.color}40;`}>
+              <div class="text-sm font-semibold" style={`color:${item.color};`}>{item.label}</div>
+              <div class="text-xs" style="color:#f0dfff;opacity:0.55;">{item.sub}</div>
             </div>
+          )
+        )}
+        <div class="pipeline-arrow">→</div>
+        <div class="glass-card px-3 py-1.5 text-center shrink-0" style="border-color:#9333EA40;">
+          <div class="text-sm font-semibold" style="color:#9333EA;">JWT Validation</div>
+          <div class="text-xs" style="color:#f0dfff;opacity:0.55;">JWKS · Cookie Auth</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow down -->
+    <div class="flex justify-center opacity-init anim-fade d-200">
+      <span class="text-[#cc97ff]/60">↓</span>
+    </div>
+
+    <!-- Services grid -->
+    <div class="grid grid-cols-3 gap-2 opacity-init anim-scale d-300">
+      {services.map((s) => (
+        <div
+          class="glass-card p-3 flex items-start gap-2"
+          style={`border-color:${s.color}30;`}
+        >
+          <span class="text-lg mt-0.5">{s.icon}</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-sm font-bold text-[#f0dfff]">{s.name}</span>
+              <span class={`badge ${s.badge}`}>{s.lang}</span>
+            </div>
+            <div class="text-xs mt-0.5" style="color:#f0dfff;opacity:0.5;">{s.db}</div>
           </div>
-          <div
-            class="h-px w-full"
-            style={`background:linear-gradient(90deg,${f.color}60,transparent);`}
-          ></div>
-          <ul class="flex flex-col gap-1.5">
-            {f.items.map((item) => (
-              <li class="flex items-start gap-2 text-sm" style="color:#f0dfff;opacity:0.8;">
-                <span style={`color:${f.color};margin-top:2px;`}>▸</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
+          <span class="text-xs font-mono shrink-0" style="color:#533e6d;">{s.port}</span>
         </div>
       ))}
     </div>
 
-    <!-- Bottom stat row -->
-    <div class="stat-row-desktop overflow-x-auto no-swipe opacity-init anim-fade-up d-700 w-full" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
-      <div class="stat-row-inner flex items-center gap-2 min-w-max">
-        {[
-          { value: 'LiveKit', sub: 'SFU WebRTC' },
-          { value: 'OpenAI STT', sub: 'gpt-4o-mini-transcribe' },
-          { value: 'Claude', sub: 'AI 요약' },
-          { value: 'Kafka', sub: '이벤트 버스' },
-          { value: 'SSE+FCM', sub: '실시간 알림' },
-          { value: 'RSA+AES', sub: '보안 스택' },
-        ].map((s) => (
-          <div class="glass-card text-center py-2 px-4 shrink-0 flex-1">
-            <div class="text-sm font-bold gradient-text whitespace-nowrap">{s.value}</div>
-            <div class="text-xs mt-0.5 whitespace-nowrap" style="color:#f0dfff;opacity:0.5;">{s.sub}</div>
+    <!-- Arrow down -->
+    <div class="flex justify-center opacity-init anim-fade d-400">
+      <span class="text-[#cc97ff]/60">↓</span>
+    </div>
+
+    <!-- Infrastructure row -->
+    <div class="grid grid-cols-4 gap-2 opacity-init anim-fade-up d-500">
+      {[
+        { icon: '📨', label: 'Kafka', sub: '이벤트 버스', color: '#ffb964', badge: 'badge-orange' },
+        { icon: '⚡', label: 'Redis', sub: '세션 / 캐시', color: '#61ff96', badge: 'badge-green' },
+        { icon: '🗄️', label: 'MinIO', sub: 'S3 호환 스토리지', color: '#61ffe6', badge: 'badge-cyan' },
+        { icon: '🗃️', label: 'MySQL / PostgreSQL', sub: '서비스별 DB', color: '#61aaff', badge: 'badge-blue' },
+      ].map((i) => (
+        <div class="glass-card px-3 py-2 flex items-center gap-2" style={`border-color:${i.color}30;`}>
+          <span class="text-base">{i.icon}</span>
+          <div>
+            <div class="text-sm font-semibold text-[#f0dfff]">{i.label}</div>
+            <div class="text-xs" style="color:#f0dfff;opacity:0.5;">{i.sub}</div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
 
   </div>

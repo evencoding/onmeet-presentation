@@ -2,151 +2,136 @@
 import SlideLayout from '../../layouts/SlideLayout.astro';
 import { Code } from 'astro:components';
 
-const webhookCode = `// LiveKitWebhookController.java
-// Track Published → 참여자별 Egress 시작
-case TRACK_PUBLISHED -> {
-    String participantIdentity =
-        event.getParticipant().getIdentity();
-    TrackInfo track = event.getTrack();
-    if (track.getSource() == TrackSource.MICROPHONE) {
-        recordingService.startParticipantTrackEgress(
-            roomName,
-            participantIdentity,
-            track.getSid()
-        );
+const cookieConverterCode = `// CookieServerAuthenticationConverter.kt
+// HttpOnly Cookie → BearerToken 변환
+override fun convert(
+    exchange: ServerWebExchange
+): Mono<Authentication> {
+    return Mono.justOrEmpty(
+        exchange.request.cookies.getFirst("accessToken")
+    )
+    .map { cookie: HttpCookie -> cookie.value }
+    .map { token: String ->
+        BearerTokenAuthenticationToken(token)
     }
-}
-
-case PARTICIPANT_LEFT -> {
-    recordingService.stopParticipantEgress(
-        roomName, participantIdentity
-    );
-    kafkaProducer.publishChunkReady(
-        roomName, participantIdentity
-    );
 }`;
 
-const egressCode = `// RoomRecordingService.java
-// LiveKit TrackEgress S3 저장
-public void startParticipantTrackEgress(
-    String roomName, String identity, String trackSid
-) {
-    TrackEgressRequest req = TrackEgressRequest.newBuilder()
-        .setRoomName(roomName)
-        .setTrackId(trackSid)
-        .setFile(DirectFileOutput.newBuilder()
-            .setFilepath(buildS3Path(roomName, identity))
-            .build())
-        .build();
-    egressClient.startTrackEgress(req);
-    activeEgress.put(identity, req);
-}`;
+const userHeaderCode = `// UserHeaderFilter.kt
+// JWT claims → 다운스트림 서비스 헤더 주입
+val userId = jwt.token.claims["userId"]?.toString() ?: ""
+val request = exchange.request.mutate()
+    .header("X-User-Id", userId)
+    .header("X-User-Email", jwt.token.subject)
+    .header("X-User-Roles",
+        jwt.authorities.joinToString(",") { it.authority })
+    .build()
+return chain.filter(exchange.mutate().request(request).build())`;
 
-const jwtCode = `// LiveKitClientImpl.java
-// HS256 JWT (raw HMAC-SHA256)
-private String generateJwt(Map<String, Object> claims) {
-    String header = base64Url(
-        objectMapper.writeValueAsBytes(
-            Map.of("alg","HS256","typ","JWT")));
-    String payload = base64Url(
-        objectMapper.writeValueAsBytes(claims));
-    String sig = hmacSha256(
-        header + "." + payload, apiSecret);
-    return header + "." + payload + "." + sig;
+const secretFilterCode = `// SecureInternalFilter.kt
+// 내부 서비스 간 X-Gateway-Secret 주입
+override fun filter(
+    exchange: ServerWebExchange,
+    chain: GatewayFilterChain
+): Mono<Void> {
+    val mutatedRequest = exchange.request.mutate()
+        .header("X-Gateway-Secret", gatewaySecret)
+        .build()
+    return chain.filter(
+        exchange.mutate().request(mutatedRequest).build()
+    )
 }`;
 ---
 
-<SlideLayout title="video-service Code" slideNumber={11}>
+<SlideLayout title="gateway-service Code" slideNumber={11}>
   <div class="w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
       <h1 class="font-['Manrope',sans-serif] font-bold text-3xl text-glow-sm" style="color:#cc97ff;">
-        화상회의 녹화 자동화 파이프라인
+        모든 요청의 보안 관문 역할
       </h1>
-      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">video-service · Java · Spring Boot · LiveKit SDK · Kafka</h2>
+      <h2 class="text-sm mt-0.5 font-medium text-[#f0dfff]/60">gateway-service · Kotlin · Spring Cloud Gateway · WebFlux</h2>
     </div>
 
     <div class="grid grid-cols-3 gap-3 opacity-init anim-scale d-200">
 
-      <!-- Webhook handler -->
+      <!-- Cookie Converter -->
       <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">WebhookController</span>
-          <span class="badge badge-blue">Webhook</span>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">CookieConverter</span>
+          <span class="badge badge-cyan">Reactive</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:230px;">
-          <Code code={webhookCode} lang="java" theme="one-dark-pro" />
+        <div class="code-block code-scroll" style="max-height:150px;">
+          <Code code={cookieConverterCode} lang="kotlin" theme="one-dark-pro" />
         </div>
-        <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#61aaff]">WebRTC 이벤트 처리</div>
+        <div class="glass-card p-2.5 flex-1">
+          <div class="text-sm font-semibold text-[#61ffe6]">Cookie → Bearer 변환</div>
           <div class="text-xs text-[#f0dfff]/55 mt-1">
-            LiveKit 서버 → Webhook → 참여자별 마이크 트랙 Egress 자동 시작.
-            PARTICIPANT_LEFT 시 Kafka audioChunkReady 발행.
+            HttpOnly Cookie의 accessToken을 Spring Security BearerToken으로 변환.
+            XSS 방어를 유지하면서 JWT 검증 파이프라인에 연결.
           </div>
         </div>
       </div>
 
-      <!-- Egress service -->
+      <!-- User Header Filter -->
       <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">RecordingService</span>
-          <span class="badge badge-blue">Egress</span>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">UserHeaderFilter</span>
+          <span class="badge badge-purple">JWT Claims</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:230px;">
-          <Code code={egressCode} lang="java" theme="one-dark-pro" />
+        <div class="code-block code-scroll" style="max-height:150px;">
+          <Code code={userHeaderCode} lang="kotlin" theme="one-dark-pro" />
         </div>
-        <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#61aaff]">TrackEgress 오케스트레이션</div>
+        <div class="glass-card p-2.5 flex-1">
+          <div class="text-sm font-semibold text-[#cc97ff]">User Context 전파</div>
           <div class="text-xs text-[#f0dfff]/55 mt-1">
-            참여자 마이크 트랙을 LiveKit Egress API로 S3에 저장.
-            activeEgress Map으로 진행 중인 녹음 관리.
+            JWT claims에서 userId·email·roles를 추출해 X-User-* 헤더로 주입.
+            다운스트림 서비스는 JWT 검증 없이 헤더만 신뢰.
           </div>
         </div>
       </div>
 
-      <!-- JWT generation -->
+      <!-- Secret Filter -->
       <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">LiveKitClient</span>
-          <span class="badge badge-blue">HS256 JWT</span>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-mono font-bold" style="color:#cc97ff;">SecureInternalFilter</span>
+          <span class="badge badge-pink">Internal Auth</span>
         </div>
-        <div class="code-block code-scroll" style="max-height:230px;">
-          <Code code={jwtCode} lang="java" theme="one-dark-pro" />
+        <div class="code-block code-scroll" style="max-height:150px;">
+          <Code code={secretFilterCode} lang="kotlin" theme="one-dark-pro" />
         </div>
-        <div class="glass-card p-2">
-          <div class="text-sm font-semibold text-[#61aaff]">LiveKit Access Token</div>
+        <div class="glass-card p-2.5 flex-1">
+          <div class="text-sm font-semibold text-[#ff95a0]">서비스 간 인증</div>
           <div class="text-xs text-[#f0dfff]/55 mt-1">
-            LiveKit API는 HS256 JWT 요구. 외부 라이브러리 없이
-            Raw HMAC-SHA256으로 직접 생성 (의존성 최소화).
+            Gateway에서 X-Gateway-Secret을 자동 주입. 내부 서비스는 이
+            헤더 존재 여부로 요청이 Gateway를 통했는지 검증.
           </div>
         </div>
       </div>
 
     </div>
 
-    <!-- Flow -->
+    <!-- Flow summary -->
     <div class="stat-row-desktop w-full opacity-init anim-fade-up d-400">
-      <div class="text-sm font-semibold mb-1.5" style="color:#cc97ff;">Recording Flow</div>
+      <div class="text-sm font-semibold mb-1.5" style="color:#cc97ff;">Request Flow</div>
       <div class="overflow-x-auto no-swipe" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
         <div class="stat-row-inner flex items-center gap-2 min-w-max">
           {[
-            { step: '📡 LiveKit Webhook', color: '#61aaff' },
-            { step: '🎙️ TrackPublished', color: '#cc97ff' },
-            { step: '▶️ startTrackEgress()', color: '#9333EA' },
-            { step: '💾 S3 OGG 저장', color: '#e197fc' },
-            { step: '👋 ParticipantLeft', color: '#ff95a0' },
-            { step: '📨 Kafka: audio-chunk-ready', color: '#ffb964' },
-            { step: '🤖 ai-service 소비', color: '#61ff96' },
+            { step: '🍪 Browser Cookie', color: '#61aaff' },
+            { step: '🔄 CookieConverter → BearerToken', color: '#cc97ff' },
+            { step: '✅ NimbusJwtDecoder (JWKS)', color: '#9333EA' },
+            { step: '📋 UserHeaderFilter', color: '#e197fc' },
+            { step: '🔐 SecureInternalFilter', color: '#ff95a0' },
+            { step: '✅ Downstream Service', color: '#61ff96' },
           ].map((s, i) => (
-            <div class="flex items-center gap-2 shrink-0 flex-1">
+            <div class="flex items-center gap-2 shrink-0">
               <div
                 class="glass-card px-3 py-2 text-xs font-medium whitespace-nowrap text-center flex-1"
                 style={`border-color:${s.color}40;color:${s.color};`}
               >
                 {s.step}
               </div>
-              {i < 6 && <span class="text-[#533e6d] text-xs">→</span>}
+              {i < 5 && <span class="text-[#533e6d] text-xs">→</span>}
             </div>
           ))}
         </div>

@@ -1,112 +1,136 @@
 ---
 import SlideLayout from '../../layouts/SlideLayout.astro';
 
-const pillars = [
+// Simple Icons CDN: https://cdn.simpleicons.org/{slug}/{color}
+const si = (slug: string, color = 'white') => `https://cdn.simpleicons.org/${slug}/${color}`;
+const ji = (slug: string) => `https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/${slug}.svg`;
+
+const columns = [
   {
-    icon: '🔑',
-    title: 'Authentication',
-    subtitle: 'auth-service · Kotlin',
-    color: '#cc97ff',
-    items: [
-      { icon: '🔑', label: 'RSA-2048 키 페어 생성', detail: 'KeyPairGenerator / SecureRandom' },
-      { icon: '🧂', label: 'AES-256-GCM 개인키 암호화', detail: 'PBKDF2 600K 반복, Salt+IV+CipherText' },
-      { icon: '✍️', label: 'RS256 JWT 서명', detail: 'JwtTokenProvider · accessToken 30분' },
-      { icon: '🌐', label: 'JWKS 엔드포인트', detail: '/auth/.well-known/jwks.json 공개 노출' },
-      { icon: '🔄', label: 'Refresh Token Rotation', detail: 'Redis 저장, 7일 TTL, HttpOnly Cookie' },
-    ],
-  },
-  {
-    icon: '🛡️',
-    title: 'Gateway Security',
-    subtitle: 'gateway-service · Kotlin · WebFlux',
+    title: 'Backend',
+    icon: si('spring', '6DB33F'),
     color: '#9333EA',
-    items: [
-      { icon: '🍪', label: 'Cookie→Bearer 변환', detail: 'CookieServerAuthenticationConverter' },
-      { icon: '✅', label: 'JWT 검증 (JWKS)', detail: 'NimbusReactiveJwtDecoder' },
-      { icon: '📋', label: 'User Header 주입', detail: 'X-User-Id / X-User-Email / X-User-Roles' },
-      { icon: '🔐', label: 'Gateway Secret', detail: 'X-Gateway-Secret 내부 서비스 인증' },
-      { icon: '⏱️', label: 'Rate Limiting', detail: 'Spring Cloud Gateway RequestRateLimiter' },
+    badgeClass: 'badge-purple',
+    techs: [
+      { logo: si('springboot', '6DB33F'), name: 'Spring Boot 3.3.5' },
+      { logo: si('kotlin', '7F52FF'), name: 'Kotlin (auth/gateway)' },
+      { logo: si('openjdk', 'FFFFFF'), name: 'Java (ai/video/noti)' },
+      { logo: si('go', '00ADD8'), name: 'Go (file-service)' },
+      { logo: si('springsecurity', '6DB33F'), name: 'Spring Security' },
+      { logo: si('spring', '6DB33F'), name: 'Spring WebFlux' },
+      { logo: si('hibernate', '59666C'), name: 'JPA + Flyway' },
     ],
   },
   {
-    icon: '🔒',
-    title: 'Data Security',
-    subtitle: 'file-service · Go · S3',
+    title: 'Frontend',
+    icon: si('react', '61DAFB'),
+    color: '#61aaff',
+    badgeClass: 'badge-blue',
+    techs: [
+      { logo: si('react', '61DAFB'), name: 'React 18' },
+      { logo: si('typescript', '3178C6'), name: 'TypeScript' },
+      { logo: si('vite', '646CFF'), name: 'Vite 7' },
+      { logo: '', name: 'Zustand v5', emoji: '🐻' },
+      { logo: si('reactquery', 'FF4154'), name: 'TanStack Query v5' },
+      { logo: si('reactrouter', 'CA4245'), name: 'React Router v6' },
+      { logo: si('tailwindcss', '06B6D4'), name: 'Tailwind CSS' },
+      { logo: si('cloudflare', 'F38020'), name: 'Cloudflare Pages' },
+    ],
+  },
+  {
+    title: 'AI & Media',
+    icon: ji('openai'),
     color: '#e197fc',
-    items: [
-      { icon: '🕵️', label: 'MIME 스푸핑 방지', detail: 'http.DetectContentType() 실제 바이너리 검사' },
-      { icon: '🛡️', label: 'S3 Key 인젝션 방어', detail: 'ownerType whitelist + 숫자 ID 검증' },
-      { icon: '🚫', label: 'Path Traversal 방어', detail: '../ 포함 여부 명시적 체크' },
-      { icon: '🚦', label: 'Semaphore 업로드 제한', detail: 'chan struct{}{} 최대 10 동시 업로드' },
-      { icon: '📄', label: 'Template Traversal 방어', detail: 'email-service ALLOWED_TEMPLATES Set' },
+    badgeClass: 'badge-purple',
+    techs: [
+      { logo: ji('openai'), name: 'OpenAI STT' },
+      { logo: si('anthropic', 'D4A27F'), name: 'Claude API' },
+      { logo: si('onnx', '005CED'), name: 'Silero VAD ONNX' },
+      { logo: si('livekit', '000000'), name: 'LiveKit SFU' },
+      { logo: si('webrtc', '333333'), name: 'WebRTC' },
+      { logo: si('gmail', 'EA4335'), name: 'Gmail OAuth2' },
+      { logo: si('thymeleaf', '005F0F'), name: 'Thymeleaf' },
+    ],
+  },
+  {
+    title: 'Infrastructure',
+    icon: si('docker', '2496ED'),
+    color: '#61ffe6',
+    badgeClass: 'badge-cyan',
+    techs: [
+      { logo: si('googlecloud', '4285F4'), name: 'GCP e2-standard-4' },
+      { logo: si('docker', '2496ED'), name: 'Docker + Compose' },
+      { logo: si('githubactions', '2088FF'), name: 'GitHub Actions' },
+      { logo: si('apachekafka', '231F20'), name: 'Kafka 7.5.0' },
+      { logo: si('redis', 'FF4438'), name: 'Redis 7' },
+      { logo: si('mysql', '4479A1'), name: 'MySQL 9.0' },
+      { logo: si('postgresql', '4169E1'), name: 'PostgreSQL 16' },
+      { logo: si('minio', 'C72E49'), name: 'MinIO (S3)' },
+      { logo: si('nginx', '009639'), name: 'Nginx' },
+      { logo: si('cloudflare', 'F38020'), name: 'Cloudflare DNS' },
     ],
   },
 ];
 ---
 
-<SlideLayout title="Security Architecture" slideNumber={6}>
+<SlideLayout title="Tech Stack" slideNumber={6}>
   <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Security Architecture</h1>
-      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">다층 보안 아키텍처 · Defense in Depth</h2>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Tech Stack</h1>
+      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">사용 기술 전체 목록</h2>
     </div>
 
-    <!-- Three pillars -->
-    <div class="grid grid-cols-3 gap-4 opacity-init anim-scale d-200">
-      {pillars.map((p, i) => (
+    <!-- 4 columns -->
+    <div class="grid grid-cols-4 gap-4">
+      {columns.map((col, i) => (
         <div
-          class={`glass-card p-4 flex flex-col gap-3`}
-          style={`border-color:${p.color}30;`}
+          class={`glass-card p-4 flex flex-col gap-3 opacity-init anim-fade-up d-${200 + i * 100}`}
+          style={`border-color:${col.color}30;`}
         >
           <div class="flex items-center gap-2">
-            <span class="text-xl">{p.icon}</span>
-            <div>
-              <div class="font-['Manrope',sans-serif] font-bold text-base text-[#f0dfff]">{p.title}</div>
-              <div class="text-xs" style={`color:${p.color};`}>{p.subtitle}</div>
-            </div>
+            <img src={col.icon} alt="" class="w-5 h-5 tech-icon" />
+            <span class="font-['Manrope',sans-serif] font-bold text-base" style={`color:${col.color};`}>{col.title}</span>
           </div>
-          <div class="h-px" style={`background:linear-gradient(90deg,${p.color}50,transparent);`}></div>
-          <div class="flex flex-col gap-2">
-            {p.items.map((item) => (
-              <div class="flex flex-col gap-0.5">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-xs">{item.icon}</span>
-                  <span class="text-sm font-medium text-[#f0dfff]">{item.label}</span>
-                </div>
-                <div class="text-xs pl-3.5 text-[#f0dfff]/50">{item.detail}</div>
-              </div>
+          <div class="h-px" style={`background:linear-gradient(90deg,${col.color}50,transparent);`}></div>
+          <div class="flex flex-wrap gap-1.5">
+            {col.techs.map((t) => (
+              <span class={`badge ${col.badgeClass} flex items-center gap-1.5`}>
+                {t.logo ? (
+                  <img src={t.logo} alt="" class="w-3.5 h-3.5 tech-icon" />
+                ) : (
+                  <span class="text-xs">{t.emoji}</span>
+                )}
+                {t.name}
+              </span>
             ))}
           </div>
         </div>
       ))}
     </div>
 
-    <!-- Request lifecycle flow -->
-    <div class="glass-card p-3 opacity-init anim-fade-up d-500">
-      <div class="text-sm font-semibold mb-2" style="color:#cc97ff;">🔄 Request Lifecycle</div>
-      <div class="overflow-x-auto no-swipe" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
-        <div class="flex items-center gap-1.5 min-w-max">
-          {[
-            { step: '🍪 Browser Cookie', color: '#61aaff' },
-            { step: '✅ Gateway JWT Validate', color: '#cc97ff' },
-            { step: '📋 Headers Inject', color: '#9333EA' },
-            { step: '🔐 Service Auth Check', color: '#e197fc' },
-            { step: '🛡️ X-Gateway-Secret', color: '#ff95a0' },
-            { step: '✅ Response', color: '#61ff96' },
-          ].map((s, i) => (
-            <div class="flex items-center gap-1.5 shrink-0">
-              <div
-                class="px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap"
-                style={`background:${s.color}15;border:1px solid ${s.color}40;color:${s.color};`}
-              >
-                {s.step}
-              </div>
-              {i < 5 && <span class="text-[#533e6d] text-xs">→</span>}
-            </div>
-          ))}
-        </div>
+    <!-- Language summary -->
+    <div class="flex flex-wrap items-center justify-center gap-3 opacity-init anim-fade-up d-600">
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        {[
+          { lang: 'Kotlin', pct: 30, color: '#9333EA', logo: si('kotlin', '7F52FF') },
+          { lang: 'Java', pct: 40, color: '#61aaff', logo: si('openjdk', 'FFFFFF') },
+          { lang: 'Go', pct: 15, color: '#61ffe6', logo: si('go', '00ADD8') },
+          { lang: 'TypeScript', pct: 15, color: '#ffb964', logo: si('typescript', '3178C6') },
+        ].map((l) => (
+          <div class="flex items-center gap-1.5">
+            <img src={l.logo} alt="" class="w-3.5 h-3.5 tech-icon" />
+            <span class="text-sm font-medium text-[#f0dfff]/80">{l.lang}</span>
+            <span class="text-sm" style={`color:${l.color};`}>{l.pct}%</span>
+          </div>
+        ))}
+      </div>
+      <div class="h-3 flex rounded-full overflow-hidden w-48">
+        <div style="width:30%;background:#9333EA;"></div>
+        <div style="width:40%;background:#61aaff;"></div>
+        <div style="width:15%;background:#61ffe6;"></div>
+        <div style="width:15%;background:#ffb964;"></div>
       </div>
     </div>
 

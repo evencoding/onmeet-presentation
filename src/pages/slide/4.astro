@@ -1,138 +1,108 @@
 ---
 import SlideLayout from '../../layouts/SlideLayout.astro';
 
-const stages = [
+const features = [
   {
-    num: '01',
-    icon: '🎙️',
-    title: 'Audio Capture',
-    sub: 'LiveKit Egress → S3',
-    color: '#61aaff',
-    details: ['LiveKit Track Egress', 'OGG/Opus 저장', 'S3 (MinIO) 업로드'],
+    icon: '🎥',
+    title: '실시간 화상회의',
+    subtitle: 'video-service · Java · LiveKit',
+    color: '#3b82f6',
+    badgeClass: 'badge-blue',
+    items: [
+      'LiveKit WebRTC SFU 기반',
+      'Gallery / Speaker 뷰 전환',
+      '채팅 · 화면 공유',
+      '대기실 (Waiting Room)',
+      'PIP 모드 지원',
+      'Kafka Egress 오디오 레코딩',
+    ],
   },
   {
-    num: '02',
-    icon: '📨',
-    title: 'Kafka Event',
-    sub: 'audio-chunk-ready',
-    color: '#ffb964',
-    details: ['audio-chunk-ready 토픽', '참여자·청크 메타 포함', '비동기 파이프라인'],
-  },
-  {
-    num: '03',
-    icon: '🔊',
-    title: 'VAD',
-    sub: 'Silero v4 ONNX',
-    color: '#cc97ff',
-    details: ['Silero VAD v4 ONNX', '무음 구간 필터링', '30ms 슬라이딩 윈도우'],
-  },
-  {
-    num: '04',
-    icon: '📝',
-    title: 'STT',
-    sub: 'OpenAI gpt-4o-mini-transcribe',
-    color: '#e197fc',
-    details: ['OpenAI STT API 호출', '세그먼트별 텍스트 변환', 'voice-segment 토픽'],
-  },
-  {
-    num: '05',
     icon: '🤖',
-    title: 'AI Summary',
-    sub: 'Claude API',
+    title: 'AI 회의록 자동 생성',
+    subtitle: 'ai-service · Java · Claude',
     color: '#9333EA',
-    details: ['Claude API 호출', 'JSON 구조화 출력', '키워드·결정·액션 추출'],
+    badgeClass: 'badge-purple',
+    items: [
+      'Silero VAD v4 ONNX 무음 필터링',
+      'OpenAI STT 세그먼트 변환',
+      'Claude API 구조화 요약',
+      '결정사항 · 액션아이템 추출',
+      'BlockNote 리치 텍스트 에디터',
+      'SSE 실시간 완성 알림',
+    ],
   },
   {
-    num: '06',
-    icon: '💾',
-    title: 'Output',
-    sub: 'file-service + SSE',
-    color: '#61ff96',
-    details: ['file-service 저장', 'SSE 실시간 알림', 'FCM 푸시 발송'],
+    icon: '🔐',
+    title: '기업급 보안 & 알림',
+    subtitle: 'auth/gateway/notification · Kotlin',
+    color: '#ff95a0',
+    badgeClass: 'badge-pink',
+    items: [
+      'RSA-2048 JWT / JWKS 엔드포인트',
+      'AES-256-GCM 키 암호화',
+      'PBKDF2 600K 반복 KDF',
+      'SSE + FCM 멀티탭 지원',
+      'Kafka 이벤트 기반 알림 발송',
+      'HttpOnly Cookie · X-Gateway-Secret',
+    ],
   },
 ];
 ---
 
-<SlideLayout title="AI Pipeline" slideNumber={4}>
+<SlideLayout title="Key Features" slideNumber={4}>
   <div class="w-full max-w-6xl mx-auto px-6 flex flex-col gap-4">
 
     <!-- Title -->
     <div class="text-center opacity-init anim-fade-up">
-      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">AI Pipeline</h1>
-      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">Audio → VAD → STT → LLM → 실시간 회의록</h2>
+      <h1 class="font-['Manrope',sans-serif] font-bold text-4xl text-glow-sm" style="color:#cc97ff;">Key Features</h1>
+      <h2 class="text-sm mt-0.5 font-medium" style="color:#f0dfff;opacity:0.6;">세 가지 핵심 기능</h2>
     </div>
 
-    <!-- Pipeline stages -->
-    <div class="overflow-x-auto no-swipe opacity-init anim-scale d-200 w-full" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
-      <div class="flex items-stretch gap-1.5 min-w-max w-full">
-        {stages.map((s, i) => (
-          <>
-            <div
-              class="glass-card p-3 flex flex-col gap-1.5 shrink-0 flex-1 overflow-hidden"
-              style={`border-color:${s.color}35;min-width:140px;`}
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold font-mono" style={`color:${s.color};`}>{s.num}</span>
-                <span class="text-base">{s.icon}</span>
-              </div>
-              <div class="font-['Manrope',sans-serif] font-bold text-sm text-[#f0dfff]">{s.title}</div>
-              <div class="text-xs" style={`color:${s.color};`}>{s.sub}</div>
-              <div class="mt-1 flex flex-col gap-0.5">
-                {s.details.map((d) => (
-                  <div class="text-xs text-[#f0dfff]/55 flex items-start gap-1">
-                    <span style={`color:${s.color};opacity:0.7;`}>·</span>
-                    {d}
-                  </div>
-                ))}
-              </div>
+    <!-- Three feature cards -->
+    <div class="grid grid-cols-3 gap-4">
+      {features.map((f, i) => (
+        <div
+          class={`glass-card p-5 flex flex-col gap-3 opacity-init anim-fade-up d-${200 + i * 150}`}
+          style={`border-color:${f.color}30;`}
+        >
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">{f.icon}</span>
+            <div>
+              <div class="font-['Manrope',sans-serif] font-bold text-base" style="color:#f0dfff;">{f.title}</div>
+              <div class="text-xs" style="color:#f0dfff;opacity:0.5;">{f.subtitle}</div>
             </div>
-            {i < stages.length - 1 && (
-              <div class="flex items-center justify-center flex-shrink-0 w-4">
-                <span class="text-[#cc97ff]/50 text-xs">→</span>
-              </div>
-            )}
-          </>
-        ))}
-      </div>
-    </div>
-
-    <!-- Kafka topics bar -->
-    <div class="glass-card p-3 opacity-init anim-fade-up d-400 w-full">
-      <div class="text-sm font-semibold mb-2" style="color:#ffb964;">📨 Kafka Topics Flow</div>
-      <div class="overflow-x-auto no-swipe" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
-        <div class="flex items-center gap-2 min-w-max">
-          {[
-            { topic: 'audio-chunk-ready', color: '#ffb964', arrow: true },
-            { topic: 'voice-segment', color: '#cc97ff', arrow: true },
-            { topic: 'meeting-summary-ready', color: '#61ff96', arrow: true },
-            { topic: 'notification-send', color: '#61aaff', arrow: false },
-          ].map((t) => (
-            <div class="flex items-center gap-1.5 shrink-0">
-              <div
-                class="px-2.5 py-1 rounded text-xs font-mono font-medium whitespace-nowrap"
-                style={`background:${t.color}15;border:1px solid ${t.color}40;color:${t.color};`}
-              >
-                {t.topic}
-              </div>
-              {t.arrow && <span class="text-[#533e6d] text-xs">→</span>}
-            </div>
-          ))}
+          </div>
+          <div
+            class="h-px w-full"
+            style={`background:linear-gradient(90deg,${f.color}60,transparent);`}
+          ></div>
+          <ul class="flex flex-col gap-1.5">
+            {f.items.map((item) => (
+              <li class="flex items-start gap-2 text-sm" style="color:#f0dfff;opacity:0.8;">
+                <span style={`color:${f.color};margin-top:2px;`}>▸</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
+      ))}
     </div>
 
-    <!-- Bottom stats -->
-    <div class="stat-row-desktop overflow-x-auto no-swipe opacity-init anim-fade-up d-500 w-full" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
-      <div class="stat-row-inner flex items-center gap-3 min-w-max w-full">
+    <!-- Bottom stat row -->
+    <div class="stat-row-desktop overflow-x-auto no-swipe opacity-init anim-fade-up d-700 w-full" style="scrollbar-width:thin;scrollbar-color:rgba(204,151,255,0.3) transparent;">
+      <div class="stat-row-inner flex items-center gap-2 min-w-max">
         {[
-          { v: 'Silero VAD', d: 'ONNX v4 무음 필터링' },
-          { v: 'OpenAI STT', d: 'gpt-4o-mini-transcribe' },
-          { v: 'Claude', d: 'JSON 구조화 요약' },
-          { v: '< 3s', d: '평균 응답 지연' },
+          { value: 'LiveKit', sub: 'SFU WebRTC' },
+          { value: 'OpenAI STT', sub: 'gpt-4o-mini-transcribe' },
+          { value: 'Claude', sub: 'AI 요약' },
+          { value: 'Kafka', sub: '이벤트 버스' },
+          { value: 'SSE+FCM', sub: '실시간 알림' },
+          { value: 'RSA+AES', sub: '보안 스택' },
         ].map((s) => (
-          <div class="glass-card text-center py-2.5 px-5 shrink-0 flex-1">
-            <div class="text-base font-bold gradient-text whitespace-nowrap">{s.v}</div>
-            <div class="text-xs mt-0.5 text-[#f0dfff]/50 whitespace-nowrap">{s.d}</div>
+          <div class="glass-card text-center py-2 px-4 shrink-0 flex-1">
+            <div class="text-sm font-bold gradient-text whitespace-nowrap">{s.value}</div>
+            <div class="text-xs mt-0.5 whitespace-nowrap" style="color:#f0dfff;opacity:0.5;">{s.sub}</div>
           </div>
         ))}
       </div>

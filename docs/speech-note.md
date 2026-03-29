@@ -12,11 +12,24 @@ OnMeet은 한 문장으로 말하면, **"AI가 회의를 기록하고 요약하�
 
 기술적으로는 **7개의 마이크로서비스**, **5개 프로그래밍 언어**, 그리고 **VAD → STT → LLM으로 이어지는 3단계 AI 파이프라인**으로 구성되어 있습니다. 크게 4가지 핵심 축이 있는데요 — WebRTC 기반 실시간 화상회의, AI 회의록 자동 생성, SSE와 FCM을 활용한 실시간 알림, 그리고 RSA/AES 기반의 기업급 보안 아키텍처입니다.
 
+그럼 먼저 저희 팀을 소개하겠습니다.
+
+---
+
+## 📌 Slide 2 — Team: 팀 구성 및 역할
+
+OnMeet을 만든 4명의 팀원 소개입니다.
+
+- **최승은** — 팀장 / Full-Stack. 프로젝트 총괄, Video Service 개발, 프론트엔드 전반.
+- **박영진** — Backend Lead. MSA 설계, Auth/Gateway/Noti 개발, CI/CD, Go 전환.
+- **조예성** — Backend. Notification Service, Flyway 마이그레이션, 인프라 안정화.
+- **양진영** — AI Backend. AI Service 전담, STT/LLM 파이프라인 구축.
+
 그럼 아키텍처부터 하나씩 살펴보겠습니다.
 
 ---
 
-## 📌 Slide 2 — System Architecture
+## 📌 Slide 3 — System Architecture
 
 이 슬라이드는 OnMeet의 **전체 시스템 아키텍처**입니다.
 
@@ -37,7 +50,7 @@ OnMeet은 한 문장으로 말하면, **"AI가 회의를 기록하고 요약하�
 
 ---
 
-## 📌 Slide 3 — Key Features
+## 📌 Slide 4 — Key Features
 
 OnMeet의 세 가지 핵심 기능입니다.
 
@@ -49,7 +62,7 @@ OnMeet의 세 가지 핵심 기능입니다.
 
 ---
 
-## 📌 Slide 4 — AI Pipeline
+## 📌 Slide 5 — AI Pipeline
 
 OnMeet의 심장부, **AI 파이프라인 전체 흐름도**입니다. 6단계로 구성됩니다.
 
@@ -69,7 +82,7 @@ OnMeet의 심장부, **AI 파이프라인 전체 흐름도**입니다. 6단계�
 
 ---
 
-## 📌 Slide 5 — Tech Stack
+## 📌 Slide 6 — Tech Stack
 
 사용 기술 전체 목록입니다.
 
@@ -85,9 +98,9 @@ OnMeet의 심장부, **AI 파이프라인 전체 흐름도**입니다. 6단계�
 
 ---
 
-## 📌 Slide 6 — Security Architecture
+## 📌 Slide 7 — Security Architecture
 
-**다층 보안 아키텍처**, Defense in Depth 전략입니다. 실제 코드는 뒤의 Code 섹션(Slide 9~10)에서 보여드리고, 여기서는 전체 설계를 짚겠습니다.
+**다층 보안 아키텍처**, Defense in Depth 전략입니다. 실제 코드는 뒤의 Code 섹션(Slide 10~11)에서 보여드리고, 여기서는 전체 설계를 짚겠습니다.
 
 **Authentication** — RSA-2048 키 페어 생성, 개인키를 AES-256-GCM으로 암호화 저장, PBKDF2 60만 회 반복 KDF, RS256 JWT 서명, JWKS 엔드포인트 공개키 배포, Refresh Token Rotation(Redis 7일 TTL, 1회 사용 후 폐기).
 
@@ -99,7 +112,7 @@ OnMeet의 심장부, **AI 파이프라인 전체 흐름도**입니다. 6단계�
 
 ---
 
-## 📌 Slide 7 — Frontend Architecture
+## 📌 Slide 8 — Frontend Architecture
 
 프론트엔드 아키텍처입니다. 여기서는 **구조와 기술 선택 결과**를 중심으로 설명드리고, 각각의 고민과 의사결정 과정은 제 회고 슬라이드에서 상세히 다루겠습니다.
 
@@ -119,7 +132,7 @@ OnMeet의 심장부, **AI 파이프라인 전체 흐름도**입니다. 6단계�
 
 ---
 
-## 📌 Slide 8 — Infrastructure & DevOps
+## 📌 Slide 9 — Infrastructure & DevOps
 
 GCP + Docker + GitHub Actions 기반 CI/CD 파이프라인입니다.
 
@@ -137,7 +150,7 @@ GCP + Docker + GitHub Actions 기반 CI/CD 파이프라인입니다.
 
 ---
 
-## 📌 Slide 9 — Code: 인증 서비스의 암호화 전략
+## 📌 Slide 10 — Code: 인증 서비스의 암호화 전략
 
 여기서부터 **Code 섹션**입니다. 앞서 보안 아키텍처 슬라이드에서 전체 설계를 보여드렸는데, 여기서는 **실제 구현 코드**를 보시겠습니다.
 
@@ -149,7 +162,7 @@ GCP + Docker + GitHub Actions 기반 CI/CD 파이프라인입니다.
 
 ---
 
-## 📌 Slide 10 — Code: Gateway 보안 관문
+## 📌 Slide 11 — Code: Gateway 보안 관문
 
 앞서 보안 슬라이드에서 소개한 Gateway의 **실제 필터 체인 코드**입니다.
 
@@ -163,7 +176,7 @@ GCP + Docker + GitHub Actions 기반 CI/CD 파이프라인입니다.
 
 ---
 
-## 📌 Slide 11 — Code: 화상회의 녹화 자동화 파이프라인
+## 📌 Slide 12 — Code: 화상회의 녹화 자동화 파이프라인
 
 AI 파이프라인 슬라이드에서 설명드린 Audio Capture 단계의 **실제 구현 코드**입니다.
 
@@ -177,7 +190,7 @@ AI 파이프라인 슬라이드에서 설명드린 Audio Capture 단계의 **실
 
 ---
 
-## 📌 Slide 12 — Code: 음성 → 텍스트 → 회의 요약 AI 파이프라인
+## 📌 Slide 13 — Code: 음성 → 텍스트 → 회의 요약 AI 파이프라인
 
 AI 파이프라인의 **3대 핵심 모델 구현 코드**입니다.
 
@@ -191,7 +204,7 @@ AI 파이프라인의 **3대 핵심 모델 구현 코드**입니다.
 
 ---
 
-## 📌 Slide 13 — Code: 웹 + 모바일 실시간 알림 이중 채널
+## 📌 Slide 14 — Code: 웹 + 모바일 실시간 알림 이중 채널
 
 notification-service의 **SSE + FCM 이중 채널 구현**입니다.
 
@@ -205,7 +218,7 @@ notification-service의 **SSE + FCM 이중 채널 구현**입니다.
 
 ---
 
-## 📌 Slide 14 — Code: 왜 Go를 썼는지 + 보안까지 잡은 파일 서버
+## 📌 Slide 15 — Code: 왜 Go를 썼는지 + 보안까지 잡은 파일 서버
 
 file-service **Go 전환의 기술 선택과 결과**입니다.
 
@@ -223,7 +236,7 @@ file-service **Go 전환의 기술 선택과 결과**입니다.
 
 ---
 
-## 📌 Slide 15 — Code: 안전한 이메일 발송 + OAuth2 토큰 관리
+## 📌 Slide 16 — Code: 안전한 이메일 발송 + OAuth2 토큰 관리
 
 email-service의 **보안 + 토큰 효율성** 코드입니다.
 
@@ -233,19 +246,7 @@ email-service의 **보안 + 토큰 효율성** 코드입니다.
 
 ---
 
-## 📌 Slide 16 — Team: 팀 구성 및 역할
-
-OnMeet을 만든 4명의 팀원 소개입니다.
-
-- **최승은** — 팀장 / Full-Stack. 프로젝트 총괄, Video Service 개발, 프론트엔드 전반.
-- **박영진** — Backend Lead. MSA 설계, Auth/Gateway/Noti 개발, CI/CD, Go 전환.
-- **조예성** — Backend. Notification Service, Flyway 마이그레이션, 인프라 안정화.
-- **양진영** — AI Backend. AI Service 전담, STT/LLM 파이프라인 구축.
-
-
----
-
-## 📌 Slide 17 — Team: 최승은 회고
+## 📌 Slide 17 — 회고: 최승은 회고
 
 앞서 프론트엔드 아키텍처와 기술 선택 결과를 보여드렸는데, 이번에는 그 뒤에 있었던 **고민과 시행착오**를 말씀드리겠습니다.
 
@@ -283,7 +284,7 @@ VAC 패턴은 CompanyManagement가 597줄까지 불어나서 하나를 고치려
 
 ---
 
-## 📌 Slide 18 — Team: 박영진 회고
+## 📌 Slide 18 — 회고: 박영진 회고
 
 박영진 Backend Lead의 회고입니다. 앞서 아키텍처와 코드로 결과를 보여드렸는데, 여기서는 **의사결정 과정과 장애 경험**을 중심으로 말씀드립니다.
 
@@ -299,7 +300,7 @@ VAC 패턴은 CompanyManagement가 597줄까지 불어나서 하나를 고치려
 
 ---
 
-## 📌 Slide 19 — Team: 조예성 회고
+## 📌 Slide 19 — 회고: 조예성 회고
 
 조예성 Backend의 회고입니다. 앞서 알림 시스템의 기술 구현을 보여드렸는데, 여기서는 **직면한 문제들과 해결 과정**을 말씀드립니다.
 
@@ -313,7 +314,7 @@ VAC 패턴은 CompanyManagement가 597줄까지 불어나서 하나를 고치려
 
 ---
 
-## 📌 Slide 20 — Team: 양진영 회고
+## 📌 Slide 20 — 회고: 양진영 회고
 
 양진영 AI Backend의 회고입니다. 앞서 AI 파이프라인의 구조와 코드를 보여드렸는데, 여기서는 **3번의 아키텍처 전면 수정**을 거쳐야 했던 고민 과정을 말씀드립니다.
 
